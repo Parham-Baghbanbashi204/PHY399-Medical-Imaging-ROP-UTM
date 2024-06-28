@@ -26,7 +26,7 @@ def main():
         frequency=5e6, amplitude=1.0, speed=medium.sound_speed, nonlinearity=0.01)
     # Simulate the wave propagation and get the results as a 3D array
     propagation_results = simulate_nonlinear_wave_propagation(
-        wave, medium, x_points, z_points, times)
+        wave, medium, x_points, z_points, times, scatterer_pos)
 
     # Ensure propagation_results has the correct shape
     assert propagation_results.shape == (len(times), len(x_points), len(
