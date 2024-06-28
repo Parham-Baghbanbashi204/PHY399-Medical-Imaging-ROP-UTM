@@ -28,15 +28,16 @@ def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times)
     # Initialize a 3D array to store the results
     results = np.zeros((nt, nx, nz))
 
+    # Create a meshgrid of spatial points
+    xx, zz = np.meshgrid(x_points, z_points, indexing='ij')
+
+    # Calculate the distances for all spatial points
+    distances = np.sqrt(xx**2 + zz**2)
+
     # Loop over each time step
     for t_idx, time in enumerate(times):
-        # Loop over each point in the x-dimension
-        for x_idx, x in enumerate(x_points):
-            # Loop over each point in the z-dimension
-            for z_idx, z in enumerate(z_points):
-                # Calculate the distance from the origin for the wave propagation
-                distance = np.sqrt(x**2 + z**2)
-                # Calculate the wave amplitude at the current time and position
-                results[t_idx, x_idx, z_idx] = wave.propagate(distance, time)
+        # Calculate the wave amplitude for all points at the current time
+        results[t_idx, :, :] = wave.amplitude * np.sin(2 * np.pi * (
+            distances / wave.speed - wave.frequency * time)) * np.exp(-wave.nonlinearity * distances)
 
     return results

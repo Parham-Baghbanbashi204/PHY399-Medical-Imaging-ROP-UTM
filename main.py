@@ -13,9 +13,9 @@ def main():
     medium = Medium(density=1000, sound_speed=1500)
 
     # Define simulation parameters
-    x_points = np.linspace(0, 100, 500)  # in mm
-    z_points = np.linspace(0, 100, 500)  # in mm
-    times = np.linspace(0, 1e-6, 1000)   # in seconds
+    x_points = np.linspace(0, 100, 100)  # Reduce number of points in mm
+    z_points = np.linspace(0, 100, 100)  # Reduce number of points in mm
+    times = np.linspace(0, 1e-6, 100)    # Reduce number of time steps in sec
 
     # Generate nonlinear ultrasound wave propagation data
     wave = NonlinearUltrasoundWave(
