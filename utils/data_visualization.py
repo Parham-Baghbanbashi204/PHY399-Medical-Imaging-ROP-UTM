@@ -2,11 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegWriter
 import matplotlib.colors as mcolors
+from matplotlib.patches import Circle
 
 
 def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_pos, interval=20, title='Wave Animation'):
     """
-    Animates the wave data over time, highlighting the first peak and first trough.
+    Animates the wave data over time, highlighting the first peak and first trough as expanding rings.
 
     :param wave_data: 3D numpy array where each slice is the wave amplitude at a given time.
     :type wave_data: numpy.ndarray
@@ -28,7 +29,7 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     fig, ax = plt.subplots()
 
     # Define the colormap with a center value of white
-    cmap = plt.get_cmap('seismic')
+    cmap = plt.get_cmap('seismic')  # type:ignore
     norm = mcolors.TwoSlopeNorm(
         vmin=-wave_data.max(), vcenter=0, vmax=wave_data.max())
 
@@ -44,28 +45,45 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     # Add legend
     ax.legend()
 
-    peak_point, = ax.plot([], [], 'ro', markersize=10, label='First Peak')
-    trough_point, = ax.plot([], [], 'bo', markersize=10, label='First Trough')
+    # Find the first peak (maximum value)
+    peak_idx = np.unravel_index(
+        np.argmax(wave_data[0, :, :]), wave_data[0, :, :].shape)
+    peak_x = x_points[peak_idx[1]]
+    peak_z = z_points[peak_idx[0]]
+    peak_radius = np.sqrt(
+        (peak_x - scatterer_pos[0])**2 + (peak_z - scatterer_pos[1])**2)
+
+    # Find the first trough (minimum value)
+    trough_idx = np.unravel_index(
+        np.argmin(wave_data[0, :, :]), wave_data[0, :, :].shape)
+    trough_x = x_points[trough_idx[1]]
+    trough_z = z_points[trough_idx[0]]
+    trough_radius = np.sqrt(
+        (trough_x - scatterer_pos[0])**2 + (trough_z - scatterer_pos[1])**2)
+
+    peak_circle = Circle(scatterer_pos, peak_radius, color='r',
+                         fill=False, linestyle='-', linewidth=2, label='Initial Peak')
+    trough_circle = Circle(scatterer_pos, trough_radius, color='b',
+                           fill=False, linestyle='-', linewidth=2, label='Initial Trough')
+
+    ax.add_patch(peak_circle)
+    ax.add_patch(trough_circle)
 
     def update(frame):
         # Update the data for the current frame
         cax.set_array(wave_data[frame, :, :])
 
-        # Find the first peak (maximum value)
-        peak_idx = np.unravel_index(
-            np.argmax(wave_data[frame, :, :]), wave_data[frame, :, :].shape)
-        peak_x = x_points[peak_idx[1]]
-        peak_z = z_points[peak_idx[0]]
+        # Update the radii of the circles
+        current_time = times[frame]
+        wave_speed = (x_points[1] - x_points[0]) / (times[1] - times[0])
+        peak_circle.set_radius(peak_radius + wave_speed * current_time)
+        trough_circle.set_radius(trough_radius + wave_speed * current_time)
 
-        # Find the first trough (minimum value)
-        trough_idx = np.unravel_index(
-            np.argmin(wave_data[frame, :, :]), wave_data[frame, :, :].shape)
-        trough_x = x_points[trough_idx[1]]
-        trough_z = z_points[trough_idx[0]]
-
-        # Update the positions of the peak and trough points
-        peak_point.set_data(peak_x, peak_z)
-        trough_point.set_data(trough_x, trough_z)
+        # Check for interaction with the figure boundary
+        for circle in [peak_circle, trough_circle]:
+            if circle.radius > max(x_points.max(), z_points.max()):
+                # Hide the circle if it goes beyond the boundary
+                circle.set_radius(0)
 
         ax.set_title(f'Time Step (nt) = {frame}')
         ax.set_xlabel('x-dimension (m)')
@@ -74,7 +92,6 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     # Create the animation object
     ani = FuncAnimation(fig, update, frames=len(
         times), interval=interval, repeat=False)
-
     # Save the animation to a video file
     writer = FFMpegWriter(fps=30, metadata=dict(artist='Me'), bitrate=1800)
     ani.save("animations/wave_animation.mp4", writer=writer)
