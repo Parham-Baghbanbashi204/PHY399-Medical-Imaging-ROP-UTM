@@ -13,9 +13,13 @@ def main():
     medium = Medium(density=1000, sound_speed=1500)
 
     # Define simulation parameters
-    x_points = np.linspace(0, 100, 100)  # Reduce number of points in mm
-    z_points = np.linspace(0, 100, 100)  # Reduce number of points in mm
-    times = np.linspace(0, 1e-6, 100)    # Reduce number of time steps in sec
+    x_points = np.linspace(0, 500, 500)  # in mm
+    z_points = np.linspace(0, 500, 500)  # in mm
+    times = np.linspace(0, 1e-6, 130)    # in seconds
+
+    # Define scatterer and receiver positions
+    scatterer_pos = (200, 200)  # in mm
+    receiver_pos = (300, 300)   # in mm
 
     # Generate nonlinear ultrasound wave propagation data
     wave = NonlinearUltrasoundWave(
@@ -29,7 +33,8 @@ def main():
         z_points)), "Shape of propagation_results is incorrect"
 
     # Animate the wave propagation
-    animate_wave(propagation_results, x_points, z_points, times)
+    animate_wave(propagation_results, x_points, z_points,
+                 times, scatterer_pos, receiver_pos)
 
 
 if __name__ == '__main__':

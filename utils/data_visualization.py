@@ -4,7 +4,7 @@ from matplotlib.animation import FuncAnimation, FFMpegWriter
 import matplotlib.colors as mcolors
 
 
-def animate_wave(wave_data, x_points, z_points, times, interval=20, title='Wave Animation'):
+def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_pos, interval=20, title='Wave Animation'):
     """
     Animates the wave data over time.
 
@@ -16,6 +16,10 @@ def animate_wave(wave_data, x_points, z_points, times, interval=20, title='Wave 
     :type z_points: numpy.ndarray
     :param times: 1D numpy array representing the time domain.
     :type times: numpy.ndarray
+    :param scatterer_pos: Tuple of the scatterer's position (x, z).
+    :type scatterer_pos: tuple
+    :param receiver_pos: Tuple of the receiver's position (x, z).
+    :type receiver_pos: tuple
     :param interval: Time between frames in milliseconds.
     :type interval: int
     :param title: Title of the animation.
@@ -24,7 +28,7 @@ def animate_wave(wave_data, x_points, z_points, times, interval=20, title='Wave 
     fig, ax = plt.subplots()
 
     # Define the colormap with a center value of white
-    cmap = plt.get_cmap('seismic')
+    cmap = plt.get_cmap('seismic')  # type:ignore
     norm = mcolors.TwoSlopeNorm(
         vmin=-wave_data.max(), vcenter=0, vmax=wave_data.max())
 
@@ -33,17 +37,27 @@ def animate_wave(wave_data, x_points, z_points, times, interval=20, title='Wave 
                     x_points.min(), x_points.max(), z_points.min(), z_points.max()], origin='lower')
     colorbar = fig.colorbar(cax, ax=ax, label='Amplitude')
 
+    # Add scatterer and receiver markers
+    scatterer = ax.plot(
+        scatterer_pos[0], scatterer_pos[1], 'ro', label='Scatterer')
+    receiver = ax.plot(
+        receiver_pos[0], receiver_pos[1], 'ks', label='Receiver')
+
+    # Add legend
+    ax.legend()
+
     def update(frame):
         # Update the data for the current frame
         cax.set_array(wave_data[frame, :, :])
         ax.set_title(f'Time Step (nt) = {frame}')
         ax.set_xlabel('x-dimension (m)')
         ax.set_ylabel('z-dimension (depth in m)')
+        ax.plot(scatterer_pos[0], scatterer_pos[1], 'ro')  # Re-plot scatterer
+        ax.plot(receiver_pos[0], receiver_pos[1], 'ks')   # Re-plot receiver
 
     # Create the animation object
     ani = FuncAnimation(fig, update, frames=len(
         times), interval=interval, repeat=False)
-
     # Save the animation to a video file
     writer = FFMpegWriter(fps=30, metadata=dict(artist='Me'), bitrate=1800)
     ani.save("animations/wave_animation.mp4", writer=writer)
