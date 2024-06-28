@@ -1,7 +1,6 @@
 """
 Basic ultrasound wave behavior with ability to modify propgated medium
 """
-# wave_propagation/propagation.py
 import numpy as np
 
 
@@ -18,6 +17,7 @@ class UltrasoundWave:
     """
 
     def __init__(self, frequency, amplitude, speed):
+        # Initialize the ultrasound wave parameters
         self.frequency = frequency
         self.amplitude = amplitude
         self.speed = speed
@@ -33,8 +33,11 @@ class UltrasoundWave:
         :return: The wave amplitude at the given distance and time.
         :rtype: float
         """
+        # Calculate the wavelength
         wavelength = self.speed / self.frequency
+        # Calculate the phase of the wave
         phase = 2 * np.pi * (distance / wavelength - self.frequency * time)
+        # Calculate and return the amplitude of the wave at the given distance and time
         return self.amplitude * np.sin(phase)
 
 
@@ -49,6 +52,7 @@ class Medium:
     """
 
     def __init__(self, density, sound_speed):
+        # Initialize the medium parameters
         self.density = density
         self.sound_speed = sound_speed
 
@@ -68,8 +72,12 @@ def simulate_wave_propagation(wave, medium, distances, times):
     :return: A 2D array where each row represents the wave amplitude at a given distance and time.
     :rtype: numpy.ndarray
     """
+    # Initialize the results array with zeros
     results = np.zeros((len(distances), len(times)))
+    # Loop over each distance
     for i, distance in enumerate(distances):
+        # Loop over each time point
         for j, time in enumerate(times):
+            # Calculate the wave amplitude at the current distance and time
             results[i, j] = wave.propagate(distance, time)
     return results

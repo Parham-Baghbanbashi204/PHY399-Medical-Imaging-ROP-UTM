@@ -20,7 +20,9 @@ class NonlinearUltrasoundWave(UltrasoundWave):
     """
 
     def __init__(self, frequency, amplitude, speed, nonlinearity):
+        # Initialize the superclass with frequency, amplitude, and speed
         super().__init__(frequency, amplitude, speed)
+        # Initialize the nonlinearity parameter
         self.nonlinearity = nonlinearity
 
     def propagate(self, distance, time):
@@ -29,11 +31,16 @@ class NonlinearUltrasoundWave(UltrasoundWave):
 
         :param distance: The distance over which the wave propagates.
         :type distance: float
-        :param time: The time duration of the propagation.
+        :param time: The time duration of
+
+ the propagation.
         :type time: float
         :return: The wave amplitude at the given distance and time.
         :rtype: float
         """
+        # Calculate the wavelength
         wavelength = self.speed / self.frequency
+        # Calculate the phase of the wave
         phase = 2 * np.pi * (distance / wavelength - self.frequency * time)
+        # Calculate and return the amplitude of the nonlinear wave at the given distance and time
         return self.amplitude * np.sin(phase) * np.exp(-self.nonlinearity * distance)
