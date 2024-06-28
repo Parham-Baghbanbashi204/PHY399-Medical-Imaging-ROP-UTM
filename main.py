@@ -13,21 +13,23 @@ def main():
     medium = Medium(density=1000, sound_speed=1500)
 
     # Define simulation parameters
-    distances = np.linspace(0, 100, 500)  # in mm
-    times = np.linspace(0, 1e-6, 1000)    # in seconds
+    x_points = np.linspace(0, 100, 500)  # in mm
+    z_points = np.linspace(0, 100, 500)  # in mm
+    times = np.linspace(0, 1e-6, 1000)   # in seconds
 
     # Generate nonlinear ultrasound wave propagation data
     wave = NonlinearUltrasoundWave(
         frequency=5e6, amplitude=1.0, speed=medium.sound_speed, nonlinearity=0.01)
+    # Simulate the wave propagation and get the results as a 3D array
     propagation_results = simulate_nonlinear_wave_propagation(
-        wave, medium, distances, times)
+        wave, medium, x_points, z_points, times)
 
-    # Reshape the propagation_results to match the expected shape for imshow
-    propagation_results_reshaped = propagation_results.reshape(
-        len(times), len(distances), len(distances))
+    # Ensure propagation_results has the correct shape
+    assert propagation_results.shape == (len(times), len(x_points), len(
+        z_points)), "Shape of propagation_results is incorrect"
 
     # Animate the wave propagation
-    animate_wave(propagation_results_reshaped, distances, times)
+    animate_wave(propagation_results, x_points, z_points, times)
 
 
 if __name__ == '__main__':

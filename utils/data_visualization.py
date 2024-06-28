@@ -3,14 +3,16 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegWriter
 
 
-def animate_wave(wave_data, distances, times, interval=20, title='Wave Animation'):
+def animate_wave(wave_data, x_points, z_points, times, interval=20, title='Wave Animation'):
     """
     Animates the wave data over time.
 
-    :param wave_data: 2D numpy array where each row is the wave amplitude at a given distance and time.
+    :param wave_data: 3D numpy array where each slice is the wave amplitude at a given time.
     :type wave_data: numpy.ndarray
-    :param distances: 1D numpy array representing the spatial domain.
-    :type distances: numpy.ndarray
+    :param x_points: 1D numpy array representing the x-dimension.
+    :type x_points: numpy.ndarray
+    :param z_points: 1D numpy array representing the z-dimension (depth).
+    :type z_points: numpy.ndarray
     :param times: 1D numpy array representing the time domain.
     :type times: numpy.ndarray
     :param interval: Time between frames in milliseconds.
@@ -18,20 +20,29 @@ def animate_wave(wave_data, distances, times, interval=20, title='Wave Animation
     :param title: Title of the animation.
     :type title: str
     """
+    # Create a figure and axis for the plot
     fig, ax = plt.subplots()
-    cax = ax.imshow(wave_data[0, :, :], cmap='seismic', extent=[distances.min(
-    ), distances.max(), distances.min(), distances.max()], origin='lower')
+    # Display the initial frame of the wave data using imshow
+    cax = ax.imshow(wave_data[0, :, :], cmap='seismic', extent=[
+                    x_points.min(), x_points.max(), z_points.min(), z_points.max()], origin='lower')
+    # Add a color bar to indicate the amplitude values
     fig.colorbar(cax, ax=ax, label='Amplitude')
 
     def update(frame):
+        # Clear the previous frame's data
         ax.clear()
-        cax = ax.imshow(wave_data[frame, :, :], cmap='seismic', extent=[distances.min(
-        ), distances.max(), distances.min(), distances.max()], origin='lower')
+        # Display the current frame of the wave data using imshow
+        cax = ax.imshow(wave_data[frame, :, :], cmap='seismic', extent=[
+                        x_points.min(), x_points.max(), z_points.min(), z_points.max()], origin='lower')
+        # Set the title to show the current time step
         ax.set_title(f'Time Step (nt) = {frame}')
+        # Label the x and y axes
         ax.set_xlabel('x-dimension (m)')
         ax.set_ylabel('z-dimension (depth in m)')
+        # Add a color bar to indicate the amplitude values
         fig.colorbar(cax, ax=ax, label='Amplitude')
 
+    # Create the animation object
     ani = FuncAnimation(fig, update, frames=len(
         times), interval=interval, repeat=False)
 
