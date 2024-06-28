@@ -33,8 +33,8 @@ def main():
         z_points)), "Shape of propagation_results is incorrect"
 
     # Animate the wave propagation
-    animate_wave(propagation_results, x_points, z_points,
-                 times, scatterer_pos, receiver_pos)
+    animate_wave(propagation_results, x_points, z_points, times,
+                 scatterer_pos, receiver_pos, threshold=0.1)
 
 
 if __name__ == '__main__':
