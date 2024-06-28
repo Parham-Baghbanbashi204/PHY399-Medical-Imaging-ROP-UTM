@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegWriter
+import matplotlib.colors as mcolors
 
 
 def animate_wave(wave_data, x_points, z_points, times, interval=20, title='Wave Animation'):
@@ -20,27 +21,24 @@ def animate_wave(wave_data, x_points, z_points, times, interval=20, title='Wave 
     :param title: Title of the animation.
     :type title: str
     """
-    # Create a figure and axis for the plot
     fig, ax = plt.subplots()
-    # Display the initial frame of the wave data using imshow
-    cax = ax.imshow(wave_data[0, :, :], cmap='seismic', extent=[
+
+    # Define the colormap with a center value of white
+    cmap = plt.get_cmap('seismic')
+    norm = mcolors.TwoSlopeNorm(
+        vmin=-wave_data.max(), vcenter=0, vmax=wave_data.max())
+
+    # Create the initial plot with a color bar
+    cax = ax.imshow(wave_data[0, :, :], cmap=cmap, norm=norm, extent=[
                     x_points.min(), x_points.max(), z_points.min(), z_points.max()], origin='lower')
-    # Add a color bar to indicate the amplitude values
-    fig.colorbar(cax, ax=ax, label='Amplitude')
+    colorbar = fig.colorbar(cax, ax=ax, label='Amplitude')
 
     def update(frame):
-        # Clear the previous frame's data
-        ax.clear()
-        # Display the current frame of the wave data using imshow
-        cax = ax.imshow(wave_data[frame, :, :], cmap='seismic', extent=[
-                        x_points.min(), x_points.max(), z_points.min(), z_points.max()], origin='lower')
-        # Set the title to show the current time step
+        # Update the data for the current frame
+        cax.set_array(wave_data[frame, :, :])
         ax.set_title(f'Time Step (nt) = {frame}')
-        # Label the x and y axes
         ax.set_xlabel('x-dimension (m)')
         ax.set_ylabel('z-dimension (depth in m)')
-        # Add a color bar to indicate the amplitude values
-        fig.colorbar(cax, ax=ax, label='Amplitude')
 
     # Create the animation object
     ani = FuncAnimation(fig, update, frames=len(
