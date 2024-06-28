@@ -14,7 +14,6 @@ def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times,
     :param x_points: 1D array of spatial points along x-dimension.
     :type x_points: numpy.ndarray
     :param z_points: 1D array of spatial points along z-dimension.
-    :type z_points: numpy.ndarray
     :param times: 1D array of time points.
     :type times: numpy.ndarray
     :param scatterer_pos: Tuple of the scatterer's position (x, z).
@@ -37,10 +36,13 @@ def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times,
     distances = np.sqrt(
         (xx - scatterer_pos[0])**2 + (zz - scatterer_pos[1])**2)
 
-    # Loop over each time step
+    # Precompute constants
+    angular_frequency = 2 * np.pi * wave.frequency
+
+    # Calculate wave amplitude for all points at all time steps
     for t_idx, time in enumerate(times):
-        # Calculate the wave amplitude for all points at the current time
-        results[t_idx, :, :] = wave.amplitude * np.sin(2 * np.pi * (
-            distances / wave.speed - wave.frequency * time)) * np.exp(-wave.nonlinearity * distances)
+        phase = angular_frequency * (time - distances / wave.speed)
+        attenuation = np.exp(-wave.nonlinearity * distances)
+        results[t_idx, :, :] = wave.amplitude * np.sin(phase) * attenuation
 
     return results
