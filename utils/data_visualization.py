@@ -4,9 +4,9 @@ from matplotlib.animation import FuncAnimation, FFMpegWriter
 import matplotlib.colors as mcolors
 
 
-def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_pos, interval=20, title='Wave Animation', threshold=0.1):
+def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_pos, interval=20, title='Wave Animation'):
     """
-    Animates the wave data over time.
+    Animates the wave data over time, highlighting the first peak and first trough.
 
     :param wave_data: 3D numpy array where each slice is the wave amplitude at a given time.
     :type wave_data: numpy.ndarray
@@ -24,8 +24,6 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     :type interval: int
     :param title: Title of the animation.
     :type title: str
-    :param threshold: Amplitude threshold for visualizing max and min values.
-    :type threshold: float
     """
     fig, ax = plt.subplots()
 
@@ -35,36 +33,48 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
         vmin=-wave_data.max(), vcenter=0, vmax=wave_data.max())
 
     # Create the initial plot with a color bar
-    masked_wave_data = np.ma.masked_inside(
-        wave_data[0, :, :], -threshold, threshold)
-    cax = ax.imshow(masked_wave_data, cmap=cmap, norm=norm, extent=[
+    cax = ax.imshow(wave_data[0, :, :], cmap=cmap, norm=norm, extent=[
                     x_points.min(), x_points.max(), z_points.min(), z_points.max()], origin='lower')
     colorbar = fig.colorbar(cax, ax=ax, label='Amplitude')
 
     # Add scatterer and receiver markers
-    scatterer = ax.plot(
-        scatterer_pos[0], scatterer_pos[1], 'ro', label='Scatterer')
-    receiver = ax.plot(
-        receiver_pos[0], receiver_pos[1], 'ks', label='Receiver')
+    ax.plot(scatterer_pos[0], scatterer_pos[1], 'ro', label='Scatterer')
+    ax.plot(receiver_pos[0], receiver_pos[1], 'ks', label='Receiver')
 
     # Add legend
     ax.legend()
 
+    peak_point, = ax.plot([], [], 'ro', markersize=10, label='First Peak')
+    trough_point, = ax.plot([], [], 'bo', markersize=10, label='First Trough')
+
     def update(frame):
-        # Mask the wave data to show only values above the threshold
-        masked_wave_data = np.ma.masked_inside(
-            wave_data[frame, :, :], -threshold, threshold)
         # Update the data for the current frame
-        cax.set_array(masked_wave_data)
+        cax.set_array(wave_data[frame, :, :])
+
+        # Find the first peak (maximum value)
+        peak_idx = np.unravel_index(
+            np.argmax(wave_data[frame, :, :]), wave_data[frame, :, :].shape)
+        peak_x = x_points[peak_idx[1]]
+        peak_z = z_points[peak_idx[0]]
+
+        # Find the first trough (minimum value)
+        trough_idx = np.unravel_index(
+            np.argmin(wave_data[frame, :, :]), wave_data[frame, :, :].shape)
+        trough_x = x_points[trough_idx[1]]
+        trough_z = z_points[trough_idx[0]]
+
+        # Update the positions of the peak and trough points
+        peak_point.set_data(peak_x, peak_z)
+        trough_point.set_data(trough_x, trough_z)
+
         ax.set_title(f'Time Step (nt) = {frame}')
         ax.set_xlabel('x-dimension (m)')
         ax.set_ylabel('z-dimension (depth in m)')
-        ax.plot(scatterer_pos[0], scatterer_pos[1], 'ro')  # Re-plot scatterer
-        ax.plot(receiver_pos[0], receiver_pos[1], 'ks')   # Re-plot receiver
 
     # Create the animation object
     ani = FuncAnimation(fig, update, frames=len(
         times), interval=interval, repeat=False)
+
     # Save the animation to a video file
     writer = FFMpegWriter(fps=30, metadata=dict(artist='Me'), bitrate=1800)
     ani.save("animations/wave_animation.mp4", writer=writer)
