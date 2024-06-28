@@ -58,6 +58,7 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     # Create the animation object
     ani = FuncAnimation(fig, update, frames=len(
         times), interval=interval, repeat=False)
+
     # Save the animation to a video file
     writer = FFMpegWriter(fps=30, metadata=dict(artist='Me'), bitrate=1800)
     ani.save("animations/wave_animation.mp4", writer=writer)
