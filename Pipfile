@@ -8,6 +8,8 @@ scipy = "*"
 numpy = "*"
 pandas = "*"
 matplotlib = "*"
+sphinx = "*"
+sphinx-autodoc-typehints = "*"
 
 [dev-packages]
 
