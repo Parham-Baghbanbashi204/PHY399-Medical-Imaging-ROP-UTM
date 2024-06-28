@@ -10,7 +10,7 @@ import sys
 import os
 project = 'Ultrasound Imaging Simulation'
 copyright = '2024, Parham Baghbanbashi, Luca Hutchison, Amar Saed, Meriyam TBD, Yimin Xu'
-author = 'Parham Baghbanbashi, Luca Hutchison, Amar Saed, Meriyam TBD, Yimin Xu'
+author = 'Parham Baghbanbashi, Luca Hutchison, Amar Saed, Meriam Sena, Yimin Xu'
 release = '1.0'
 
 # -- General configuration ---------------------------------------------------

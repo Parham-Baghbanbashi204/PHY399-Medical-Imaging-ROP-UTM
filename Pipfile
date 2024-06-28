@@ -10,6 +10,7 @@ pandas = "*"
 matplotlib = "*"
 sphinx = "*"
 sphinx-autodoc-typehints = "*"
+pytest = "*"
 
 [dev-packages]
 
