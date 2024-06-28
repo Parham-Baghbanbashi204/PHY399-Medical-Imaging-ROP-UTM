@@ -3,7 +3,7 @@ from wave_propagation.nonlinear_wave import NonlinearUltrasoundWave
 from wave_propagation.propagation import Medium
 
 
-def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times):
+def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times, scatterer_pos):
     """
     Simulate nonlinear wave propagation in a medium.
 
@@ -17,6 +17,8 @@ def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times)
     :type z_points: numpy.ndarray
     :param times: 1D array of time points.
     :type times: numpy.ndarray
+    :param scatterer_pos: Tuple of the scatterer's position (x, z).
+    :type scatterer_pos: tuple
     :return: A 3D array of wave amplitudes over time and space.
     :rtype: numpy.ndarray
     """
@@ -31,8 +33,9 @@ def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times)
     # Create a meshgrid of spatial points
     xx, zz = np.meshgrid(x_points, z_points, indexing='ij')
 
-    # Calculate the distances for all spatial points
-    distances = np.sqrt(xx**2 + zz**2)
+    # Calculate the distances from the scatterer for all spatial points
+    distances = np.sqrt(
+        (xx - scatterer_pos[0])**2 + (zz - scatterer_pos[1])**2)
 
     # Loop over each time step
     for t_idx, time in enumerate(times):
