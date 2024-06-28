@@ -4,7 +4,7 @@ from matplotlib.animation import FuncAnimation, FFMpegWriter
 import matplotlib.colors as mcolors
 
 
-def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_pos, interval=20, title='Wave Animation'):
+def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_pos, interval=20, title='Wave Animation', threshold=0.1):
     """
     Animates the wave data over time.
 
@@ -24,16 +24,20 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     :type interval: int
     :param title: Title of the animation.
     :type title: str
+    :param threshold: Amplitude threshold for visualizing max and min values.
+    :type threshold: float
     """
     fig, ax = plt.subplots()
 
     # Define the colormap with a center value of white
-    cmap = plt.get_cmap('seismic')  # type:ignore
+    cmap = plt.get_cmap('seismic')
     norm = mcolors.TwoSlopeNorm(
         vmin=-wave_data.max(), vcenter=0, vmax=wave_data.max())
 
     # Create the initial plot with a color bar
-    cax = ax.imshow(wave_data[0, :, :], cmap=cmap, norm=norm, extent=[
+    masked_wave_data = np.ma.masked_inside(
+        wave_data[0, :, :], -threshold, threshold)
+    cax = ax.imshow(masked_wave_data, cmap=cmap, norm=norm, extent=[
                     x_points.min(), x_points.max(), z_points.min(), z_points.max()], origin='lower')
     colorbar = fig.colorbar(cax, ax=ax, label='Amplitude')
 
@@ -47,8 +51,11 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     ax.legend()
 
     def update(frame):
+        # Mask the wave data to show only values above the threshold
+        masked_wave_data = np.ma.masked_inside(
+            wave_data[frame, :, :], -threshold, threshold)
         # Update the data for the current frame
-        cax.set_array(wave_data[frame, :, :])
+        cax.set_array(masked_wave_data)
         ax.set_title(f'Time Step (nt) = {frame}')
         ax.set_xlabel('x-dimension (m)')
         ax.set_ylabel('z-dimension (depth in m)')
@@ -58,7 +65,6 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     # Create the animation object
     ani = FuncAnimation(fig, update, frames=len(
         times), interval=interval, repeat=False)
-
     # Save the animation to a video file
     writer = FFMpegWriter(fps=30, metadata=dict(artist='Me'), bitrate=1800)
     ani.save("animations/wave_animation.mp4", writer=writer)
