@@ -15,7 +15,7 @@ def main():
     # Define simulation parameters
     x_points = np.linspace(0, 500, 500)  # in mm
     z_points = np.linspace(0, 500, 500)  # in mm
-    times = np.linspace(0, 1e-6, 130)    # in seconds
+    times = np.linspace(0, 1e-6, 340)    # in seconds
 
     # Define scatterer and receiver positions
     scatterer_pos = (200, 200)  # in mm
@@ -33,8 +33,8 @@ def main():
         z_points)), "Shape of propagation_results is incorrect"
 
     # Animate the wave propagation
-    animate_wave(propagation_results, x_points, z_points, times,
-                 scatterer_pos, receiver_pos, threshold=0.1)
+    animate_wave(propagation_results, x_points, z_points,
+                 times, scatterer_pos, receiver_pos)
 
 
 if __name__ == '__main__':
