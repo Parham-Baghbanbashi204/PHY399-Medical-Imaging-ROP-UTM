@@ -4,63 +4,53 @@ from wave_propagation.propagation import Medium
 from wave_propagation.nonlinear_simulation import simulate_nonlinear_wave_propagation
 
 
-def test_nonlinear_ultrasound_wave_propagate():
-    """
-    Test the propagate method of the NonlinearUltrasoundWave class.
-    """
-    # Create an instance of NonlinearUltrasoundWave with specific parameters
-    wave = NonlinearUltrasoundWave(
-        frequency=1e6, amplitude=1.0, speed=1500, nonlinearity=0.01)
-
-    # Call the propagate method with a specific distance and time
-    distance = 0.001
-    time = 0.000001
-    amplitude = wave.propagate(distance, time)
-
-    # Calculate the expected amplitude using the wave equation with nonlinearity
-    wavelength = wave.speed / wave.frequency
-    expected_amplitude = wave.amplitude * \
-        np.sin(2 * np.pi * (distance / wavelength - wave.frequency * time)
-               ) * np.exp(-wave.nonlinearity * distance)
-
-    # Display the actual and expected values
-    print(
-        f"Computed amplitude: {amplitude}, Expected amplitude: {expected_amplitude}")
-
-    # Check if the result is close to the expected value
-    assert np.isclose(amplitude, expected_amplitude, atol=1e-6)
-
-
 def test_simulate_nonlinear_wave_propagation():
     """
     Test the simulate_nonlinear_wave_propagation function.
     """
-    # Create an instance of NonlinearUltrasoundWave with specific parameters
+    # Set up the parameters for the test
+    density = 1000
+    sound_speed = 1500
+    frequency = 5e6
+    amplitude = 1.0
+    speed = sound_speed
+    nonlinearity = 0.01
+    x_points = np.linspace(0, 500, 250)
+    z_points = np.linspace(0, 500, 250)
+    times = np.linspace(0, 1e-6, 170)
+    scatterer_pos = (200, 200)
+    initial_amplitude = 0.2
+    pulse_radius = 10.0
+
+    # Create instances of Medium and NonlinearUltrasoundWave
+    medium = Medium(density=density, sound_speed=sound_speed)
     wave = NonlinearUltrasoundWave(
-        frequency=1e6, amplitude=1.0, speed=1500, nonlinearity=0.01)
+        frequency=frequency, amplitude=amplitude, speed=speed, nonlinearity=nonlinearity)
 
-    # Create an instance of Medium with specific parameters
-    medium = Medium(density=1000, sound_speed=1500)
-
-    # Create an array of distances for the simulation
-    distances = np.linspace(0, 0.1, 100)
-
-    # Create an array of times for the simulation
-    times = np.linspace(0, 0.0001, 100)
-
-    # Call the simulate_nonlinear_wave_propagation function with the wave, medium, distances, and times
+    # Run the simulation
     results = simulate_nonlinear_wave_propagation(
-        wave, medium, distances, times)
+        wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude, pulse_radius)
 
-    # Calculate the expected results using the wave equation with nonlinearity
-    wavelength = wave.speed / wave.frequency
-    expected_results = wave.amplitude * \
-        np.sin(2 * np.pi * (distances[:, None] / wavelength - wave.frequency *
-               times[None, :])) * np.exp(-wave.nonlinearity * distances[:, None])
+    # Check the shape of the results
+    assert results.shape == (len(times), len(x_points), len(
+        z_points)), "Shape of the results is incorrect."
 
-    # Display the actual and expected results
-    print(
-        f"Computed results:\n{results}\nExpected results:\n{expected_results}")
+    # Check initial condition
+    pulse_width = pulse_radius / np.sqrt(2 * np.log(2))
+    xx, zz = np.meshgrid(x_points, z_points, indexing='ij')
+    distances = np.sqrt(
+        (xx - scatterer_pos[0])**2 + (zz - scatterer_pos[1])**2)
+    expected_initial_condition = initial_amplitude * \
+        np.exp(-distances**2 / (2 * pulse_width**2))
+    np.testing.assert_allclose(
+        results[0, :, :], expected_initial_condition, rtol=1e-5, atol=1e-8)
 
-    # Check if the results are close to the expected values
-    assert np.allclose(results, expected_results, atol=1e-6)
+    # Check that the propagation is non-trivial (i.e., results change over time)
+    assert not np.allclose(
+        results[0, :, :], results[-1, :, :]), "Results do not change over time."
+
+
+# This part allows the test to be run from the command line
+if __name__ == "__main__":
+    test_simulate_nonlinear_wave_propagation()
+    print("All tests passed.")

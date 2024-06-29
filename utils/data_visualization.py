@@ -29,7 +29,7 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     fig, ax = plt.subplots()
 
     # Define the colormap with a center value of white
-    cmap = plt.get_cmap('seismic')
+    cmap = plt.get_cmap('seismic')  # type:ignore
     norm = mcolors.TwoSlopeNorm(
         vmin=-wave_data.max(), vcenter=0, vmax=wave_data.max())
 

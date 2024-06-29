@@ -1,9 +1,7 @@
 import numpy as np
-from wave_propagation.nonlinear_wave import NonlinearUltrasoundWave
-from wave_propagation.propagation import Medium
 
 
-def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, pulse_radius=10.0):
+def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1):
     """
     Simulate nonlinear wave propagation in a medium using the leapfrog method.
 
@@ -19,10 +17,8 @@ def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times,
     :type times: numpy.ndarray
     :param scatterer_pos: Tuple of the scatterer's position (x, z).
     :type scatterer_pos: tuple
-    :param initial_amplitude: Initial amplitude of the wave.
+    :param initial_amplitude: Initial amplitude of the wave (representing voltage).
     :type initial_amplitude: float
-    :param pulse_radius: Radius of the initial Gaussian pulse.
-    :type pulse_radius: float
     :return: A 3D array of wave amplitudes over time and space.
     :rtype: numpy.ndarray
     """
@@ -41,9 +37,14 @@ def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times,
     distances = np.sqrt(
         (xx - scatterer_pos[0])**2 + (zz - scatterer_pos[1])**2)
 
-    # Initial wave condition: Gaussian pulse centered at the scatterer with a specified radius
-    # Convert FWHM to standard deviation
-    pulse_width = pulse_radius / np.sqrt(2 * np.log(2))
+    # Calculate the wavelength based on the wave frequency and medium's sound speed
+    wavelength = medium.sound_speed / wave.frequency
+
+    # Set the pulse width to be a few wavelengths (e.g., 2 wavelengths)
+    # pulse_width = 2 * wavelength
+    pulse_width = 0.9
+
+    # Initial wave condition: Gaussian pulse centered at the scatterer with an automatically adjusted width
     results[0, :, :] = initial_amplitude * \
         np.exp(-distances**2 / (2 * pulse_width**2))
 

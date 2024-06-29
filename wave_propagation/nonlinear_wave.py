@@ -7,7 +7,7 @@ from .propagation import UltrasoundWave
 
 class NonlinearUltrasoundWave(UltrasoundWave):
     """
-    Class to represent a nonlinear ultrasound wave.
+    Class to represent a nonlinear Gaussian ultrasound wave.
 
     :param frequency: The frequency of the wave in Hz.
     :type frequency: float
@@ -27,20 +27,21 @@ class NonlinearUltrasoundWave(UltrasoundWave):
 
     def propagate(self, distance, time):
         """
-        Simulate the propagation of the nonlinear wave.
+        Simulate the propagation of the nonlinear Gaussian wave.
 
         :param distance: The distance over which the wave propagates.
         :type distance: float
-        :param time: The time duration of
-
- the propagation.
+        :param time: The time duration of the propagation.
         :type time: float
         :return: The wave amplitude at the given distance and time.
         :rtype: float
         """
         # Calculate the wavelength
         wavelength = self.speed / self.frequency
-        # Calculate the phase of the wave
-        phase = 2 * np.pi * (distance / wavelength - self.frequency * time)
-        # Calculate and return the amplitude of the nonlinear wave at the given distance and time
-        return self.amplitude * np.sin(phase) * np.exp(-self.nonlinearity * distance)
+        # Calculate the Gaussian envelope based on distance and time
+        envelope = np.exp(-((distance - self.speed * time)
+                          ** 2) / (2 * (wavelength ** 2)))
+        # Apply the nonlinearity effect
+        nonlinear_effect = np.exp(-self.nonlinearity * distance)
+        # Calculate and return the amplitude of the nonlinear Gaussian wave at the given distance and time
+        return self.amplitude * envelope * nonlinear_effect
