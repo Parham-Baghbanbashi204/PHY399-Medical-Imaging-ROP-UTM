@@ -42,14 +42,19 @@ def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times,
         (xx - scatterer_pos[0])**2 + (zz - scatterer_pos[1])**2)
 
     # Calculate the wavelength based on the wave frequency and medium's sound speed
-    wavelength = medium.sound_speed / wave.frequency
+    wavelength = medium.sound_speed / wave.frequency  # in m
+    # convert to mm for the simulations order of magnitude:
+    wavelength = wavelength*1e3  # in mm
 
-    # Set the pulse length to be a few wavelengths (e.g., 3 wavelengths)
+    # Set the pulse length to be a few wavelengths (e.g., num_cycles wavelengths)
     pulse_length = num_cycles * wavelength
 
-    # Initial wave condition: Gaussian pulse centered at the scatterer with an automatically adjusted width as per gauss's wave eqn
+    # Calculate the Gaussian pulse width (standard deviation)
+    sigma = pulse_length / 2.355
+
+    # Initial wave condition: Gaussian pulse centered at the scatterer with an automatically adjusted width
     results[0, :, :] = initial_amplitude * \
-        np.exp(-distances**2 / (2 * (pulse_length/2.355)**2))
+        np.exp(-distances**2 / (2 * sigma**2))
 
     # Time step (dt) and spatial step (dx)
     dx = x_points[1] - x_points[0]

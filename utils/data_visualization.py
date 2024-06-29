@@ -49,8 +49,8 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
         # Update the data for the current frame
         cax.set_array(wave_data[frame, :, :])
         ax.set_title(f'Time Step (nt) = {frame}')
-        ax.set_xlabel('x-dimension (m)')
-        ax.set_ylabel('z-dimension (depth in m)')
+        ax.set_xlabel('x-dimension (mm)')
+        ax.set_ylabel('z-dimension (depth in mm)')
 
     # Create the animation object
     ani = FuncAnimation(fig, update, frames=len(

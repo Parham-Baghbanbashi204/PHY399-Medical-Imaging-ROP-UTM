@@ -54,7 +54,7 @@ class Medium:
     def __init__(self, density, sound_speed):
         # Initialize the medium parameters
         self.density = density
-        self.sound_speed = sound_speed
+        self.sound_speed = sound_speed  # in m/s
 
 
 def simulate_wave_propagation(wave, medium, distances, times):
