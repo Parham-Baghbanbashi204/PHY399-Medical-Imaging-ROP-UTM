@@ -10,7 +10,7 @@ def main():
     Main function to run the ultrasound simulation and visualization.
     """
     # Define medium properties
-    medium = Medium(density=1000, sound_speed=1500)
+    medium = Medium(density=1000, sound_speed=1530)
 
     # Define simulation parameters
     # Reduce the number of spatial points to speed up simulation
@@ -25,11 +25,11 @@ def main():
     receiver_pos = (300, 300)   # in mm
 
     # Initial amplitude (representing voltage)
-    initial_amplitude = 3  # in V
+    initial_amplitude = 10  # in V
 
     # Generate nonlinear ultrasound wave propagation data
     wave = NonlinearUltrasoundWave(
-        frequency=10e6, amplitude=3.0, speed=medium.sound_speed, nonlinearity=0.01)
+        frequency=10e6, amplitude=1.0, speed=medium.sound_speed, nonlinearity=0.01)
     # Simulate the wave propagation and get the results as a 3D array
     propagation_results = simulate_nonlinear_wave_propagation(
         wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude)
