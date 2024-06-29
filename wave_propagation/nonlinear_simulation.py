@@ -81,4 +81,3 @@ def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times,
         ) * (dt**2 / dx**2)
 
     return results
-

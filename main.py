@@ -3,11 +3,11 @@ Main Module
 ============
 This module runs the ultrasound simulation and visualization.
 """
+import numpy as np
 from wave_propagation.propagation import Medium
-from wave_propagation.nonlinear_simulation import simulate_nonlinear_wave_propagation
 from wave_propagation.nonlinear_wave import NonlinearUltrasoundWave
 from utils.data_visualization import animate_wave
-import numpy as np
+from wave_propagation.nonlinear_simulation import simulate_nonlinear_wave_propagation
 
 
 def main():
@@ -21,7 +21,7 @@ def main():
     x_points = np.linspace(0, 100, 500)  # 500 points along x-dimension in mm
     # 500 points along z-dimension (depth) in mm
     z_points = np.linspace(0, 100, 500)
-    times = np.linspace(0, 1e-6, 500)    # 100 time steps up to 1 microsecond
+    times = np.linspace(0, 1e-6, 500)    # 500 time steps up to 1 microsecond
 
     # Define scatterer and receiver positions
     scatterer_pos = (50, 50)  # in mm
@@ -31,7 +31,7 @@ def main():
     initial_amplitude = 3.0  # Adjust this value to change wave strength
 
     # Number of cycles in the ultrasound pulse
-    num_cycles = 25  # Typical value for ultrasound pulses
+    num_cycles = 3  # Typical value for ultrasound pulses
 
     # Frequency of the ultrasound wave
     frequency = 5e6  # 5 MHz
