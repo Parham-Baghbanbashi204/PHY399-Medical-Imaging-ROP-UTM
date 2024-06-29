@@ -3,6 +3,7 @@ Nonlinear Wave Module
 ======================
 This module defines classes for nonlinear ultrasound waves.
 """
+
 import numpy as np
 from .propagation import UltrasoundWave
 
@@ -22,7 +23,17 @@ class NonlinearUltrasoundWave(UltrasoundWave):
     """
 
     def __init__(self, frequency, amplitude, speed, nonlinearity):
-        # Initialize the superclass with frequency, amplitude, and speed
+        # Validate parameters
+        if not isinstance(frequency, (int, float)) or frequency <= 0:
+            raise ValueError("Frequency must be a positive number.")
+        if not isinstance(amplitude, (int, float)) or amplitude <= 0:
+            raise ValueError("Amplitude must be a positive number.")
+        if not isinstance(speed, (int, float)) or speed <= 0:
+            raise ValueError("Speed must be a positive number.")
+        if not isinstance(nonlinearity, (int, float)) or nonlinearity < 0:
+            raise ValueError("Nonlinearity must be a non-negative number.")
+
+        # Initialize superclass with frequency, amplitude, and speed
         super().__init__(frequency, amplitude, speed)
         # Initialize the nonlinearity parameter
         self.nonlinearity = nonlinearity
@@ -38,6 +49,12 @@ class NonlinearUltrasoundWave(UltrasoundWave):
         :return: The wave amplitude at the given distance and time.
         :rtype: float
         """
+        # Validate parameters
+        if not isinstance(distance, (int, float)) or distance < 0:
+            raise ValueError("Distance must be a non-negative number.")
+        if not isinstance(time, (int, float)) or time < 0:
+            raise ValueError("Time must be a non-negative number.")
+
         # Calculate the wavelength
         wavelength = self.speed / self.frequency
         # Calculate the Gaussian envelope

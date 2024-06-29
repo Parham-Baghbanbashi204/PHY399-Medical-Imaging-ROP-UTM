@@ -11,6 +11,7 @@ matplotlib = "*"
 sphinx = "*"
 sphinx-autodoc-typehints = "*"
 pytest = "*"
+numba = "*"
 
 [dev-packages]
 

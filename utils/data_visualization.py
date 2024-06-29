@@ -3,11 +3,11 @@ Data Visualization Module
 ==========================
 This module defines functions for visualizing wave and RF signal data.
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegWriter
 import matplotlib.colors as mcolors
-from matplotlib.patches import Circle
 
 
 def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_pos, interval=20, title='Wave Animation'):
@@ -31,10 +31,11 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     :param title: Title of the animation.
     :type title: str
     """
+    # Create the figure and axis objects
     fig, ax = plt.subplots()
 
     # Define the colormap with a center value of white
-    cmap = plt.get_cmap('seismic')  # type:ignore
+    cmap = plt.get_cmap('seismic')
     norm = mcolors.TwoSlopeNorm(
         vmin=-wave_data.max(), vcenter=0, vmax=wave_data.max())
 
@@ -51,6 +52,12 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     ax.legend()
 
     def update(frame):
+        """
+        Update function for each frame of the animation.
+
+        :param frame: Current frame number.
+        :type frame: int
+        """
         # Update the data for the current frame
         cax.set_array(wave_data[frame, :, :])
         ax.set_title(f'Time Step (nt) = {frame}')
@@ -60,6 +67,7 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     # Create the animation object
     ani = FuncAnimation(fig, update, frames=len(
         times), interval=interval, repeat=False)
+
     # Save the animation to a video file
     writer = FFMpegWriter(fps=30, metadata=dict(artist='Me'), bitrate=1800)
     ani.save("animations/wave_animation.mp4", writer=writer)
@@ -78,23 +86,29 @@ def animate_rf_signal(rf_data, time, interval=20, title='RF Signal Animation'):
     :param title: Title of the animation.
     :type title: str
     """
-    # Create a figure and axis for the plot
+    # Create the figure and axis objects
     fig, ax = plt.subplots()
-    # Initialize a line object to be updated in the animation
+
+    # Initialize the line object
     line, = ax.plot(time, rf_data[0, :])
 
     def update(frame):
-        # Update the line data for the current frame
+        """
+        Update function for each frame of the animation.
+
+        :param frame: Current frame number.
+        :type frame: int
+        """
+        # Update the y-data of the line object for the current frame
         line.set_ydata(rf_data[frame, :])
-        return line,
+        ax.set_title(f'Time Step (nt) = {frame}')
+        ax.set_xlabel('Time (s)')
+        ax.set_ylabel('Amplitude')
 
     # Create the animation object
-    ani = FuncAnimation(fig, update, frames=range(
-        rf_data.shape[0]), interval=interval, blit=True)
-    # Set the title and labels for the plot
-    ax.set_title(title)
-    ax.set_xlabel('Time')
-    ax.set_ylabel('Amplitude')
+    ani = FuncAnimation(
+        fig, update, frames=rf_data.shape[0], interval=interval, repeat=False)
+
     # Save the animation to a video file
     writer = FFMpegWriter(fps=30, metadata=dict(artist='Me'), bitrate=1800)
-    ani.save("animaitons/rf_animation.mp4", writer=writer)
+    ani.save("animations/rf_signal_animation.mp4", writer=writer)
