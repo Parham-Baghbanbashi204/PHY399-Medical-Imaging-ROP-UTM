@@ -161,5 +161,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# assistance files 
+# assistance files - local prototyping and notes 
 assistance.md
+assistanceUpdated.md

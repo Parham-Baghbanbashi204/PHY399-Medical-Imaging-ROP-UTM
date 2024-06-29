@@ -23,10 +23,10 @@ def main():
     receiver_pos = (75, 75)   # in mm
 
     # Initial amplitude (representing voltage)
-    initial_amplitude = 30.0  # Adjust this value to change wave strength
+    initial_amplitude = 3.0  # Adjust this value to change wave strength
 
     # Number of cycles in the ultrasound pulse
-    num_cycles = 3  # Typical value for ultrasound pulses
+    num_cycles = 25  # Typical value for ultrasound pulses
 
     # Frequency of the ultrasound wave
     frequency = 5e6  # 5 MHz
