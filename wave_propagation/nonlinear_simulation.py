@@ -3,7 +3,7 @@ from wave_propagation.nonlinear_wave import NonlinearUltrasoundWave
 from wave_propagation.propagation import Medium
 
 
-def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1):
+def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, pulse_radius=10.0):
     """
     Simulate nonlinear wave propagation in a medium using the leapfrog method.
 
@@ -21,6 +21,8 @@ def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times,
     :type scatterer_pos: tuple
     :param initial_amplitude: Initial amplitude of the wave.
     :type initial_amplitude: float
+    :param pulse_radius: Radius of the initial Gaussian pulse.
+    :type pulse_radius: float
     :return: A 3D array of wave amplitudes over time and space.
     :rtype: numpy.ndarray
     """
@@ -39,10 +41,11 @@ def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times,
     distances = np.sqrt(
         (xx - scatterer_pos[0])**2 + (zz - scatterer_pos[1])**2)
 
-    # Initial wave condition: small sinusoidal wave centered at the scatterer
-    wavelength = 1 / wave.frequency  # Wavelength of the wave
+    # Initial wave condition: Gaussian pulse centered at the scatterer with a specified radius
+    # Convert FWHM to standard deviation
+    pulse_width = pulse_radius / np.sqrt(2 * np.log(2))
     results[0, :, :] = initial_amplitude * \
-        np.sin(2 * np.pi * distances / wavelength)
+        np.exp(-distances**2 / (2 * pulse_width**2))
 
     # Time step (dt) and spatial step (dx)
     dx = x_points[1] - x_points[0]

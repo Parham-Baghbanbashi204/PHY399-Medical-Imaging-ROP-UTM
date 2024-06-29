@@ -14,25 +14,26 @@ def main():
 
     # Define simulation parameters
     # Reduce the number of spatial points to speed up simulation
-    x_points = np.linspace(0, 500, 250)
+    x_points = np.linspace(0, 500, 250)  # in mm
     # Reduce the number of spatial points to speed up simulation
-    z_points = np.linspace(0, 500, 250)
+    z_points = np.linspace(0, 500, 250)  # in mm
     # Reduce the number of time steps to speed up simulation
-    times = np.linspace(0, 1e-6, 170)
+    times = np.linspace(0, 1e-6, 170)  # in sec
 
     # Define scatterer and receiver positions
     scatterer_pos = (200, 200)  # in mm
     receiver_pos = (300, 300)   # in mm
 
-    # Initial amplitude
-    initial_amplitude = 0.2  # Adjust this value as needed
+    # Initial amplitude and pulse radius
+    initial_amplitude = 0.5  # Adjust this value as needed
+    pulse_radius = 15  # Pulse radius in mm
 
     # Generate nonlinear ultrasound wave propagation data
     wave = NonlinearUltrasoundWave(
-        frequency=5e6, amplitude=1.0, speed=medium.sound_speed, nonlinearity=0.01)
+        frequency=10e6, amplitude=1.0, speed=medium.sound_speed, nonlinearity=0.01)
     # Simulate the wave propagation and get the results as a 3D array
     propagation_results = simulate_nonlinear_wave_propagation(
-        wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude)
+        wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude, pulse_radius)
 
     # Ensure propagation_results has the correct shape
     assert propagation_results.shape == (len(times), len(x_points), len(

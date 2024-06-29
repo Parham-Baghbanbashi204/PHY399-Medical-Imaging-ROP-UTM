@@ -45,46 +45,9 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     # Add legend
     ax.legend()
 
-    # Find the first peak (maximum value)
-    peak_idx = np.unravel_index(
-        np.argmax(wave_data[0, :, :]), wave_data[0, :, :].shape)
-    peak_x = x_points[peak_idx[1]]
-    peak_z = z_points[peak_idx[0]]
-    peak_radius = np.sqrt(
-        (peak_x - scatterer_pos[0])**2 + (peak_z - scatterer_pos[1])**2)
-
-    # Find the first trough (minimum value)
-    trough_idx = np.unravel_index(
-        np.argmin(wave_data[0, :, :]), wave_data[0, :, :].shape)
-    trough_x = x_points[trough_idx[1]]
-    trough_z = z_points[trough_idx[0]]
-    trough_radius = np.sqrt(
-        (trough_x - scatterer_pos[0])**2 + (trough_z - scatterer_pos[1])**2)
-
-    peak_circle = Circle(scatterer_pos, peak_radius, color='r',
-                         fill=False, linestyle='-', linewidth=2, label='Initial Peak')
-    trough_circle = Circle(scatterer_pos, trough_radius, color='b',
-                           fill=False, linestyle='-', linewidth=2, label='Initial Trough')
-
-    ax.add_patch(peak_circle)
-    ax.add_patch(trough_circle)
-
     def update(frame):
         # Update the data for the current frame
         cax.set_array(wave_data[frame, :, :])
-
-        # Update the radii of the circles
-        current_time = times[frame]
-        wave_speed = (x_points[1] - x_points[0]) / (times[1] - times[0])
-        peak_circle.set_radius(peak_radius + wave_speed * current_time)
-        trough_circle.set_radius(trough_radius + wave_speed * current_time)
-
-        # Check for interaction with the figure boundary
-        for circle in [peak_circle, trough_circle]:
-            if circle.radius > max(x_points.max(), z_points.max()):
-                # Hide the circle if it goes beyond the boundary
-                circle.set_radius(0)
-
         ax.set_title(f'Time Step (nt) = {frame}')
         ax.set_xlabel('x-dimension (m)')
         ax.set_ylabel('z-dimension (depth in m)')
