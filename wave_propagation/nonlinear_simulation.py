@@ -47,7 +47,7 @@ def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times,
     # Set the pulse length to be a few wavelengths (e.g., 3 wavelengths)
     pulse_length = num_cycles * wavelength
 
-    # Initial wave condition: Gaussian pulse centered at the scatterer with an automatically adjusted width
+    # Initial wave condition: Gaussian pulse centered at the scatterer with an automatically adjusted width as per gauss's wave eqn
     results[0, :, :] = initial_amplitude * \
         np.exp(-distances**2 / (2 * (pulse_length/2.355)**2))
 
