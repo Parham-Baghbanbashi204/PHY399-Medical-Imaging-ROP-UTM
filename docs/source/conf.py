@@ -8,8 +8,8 @@
 
 import sys
 import os
-project = 'Ultrasound Imaging Simulation'
-copyright = '2024, Parham Baghbanbashi, Luca Hutchison, Amar Saed, Meriyam TBD, Yimin Xu'
+project = 'Ultrasound Imaging Simulator'
+copyright = '2024, Parham Baghbanbashi, Luca Hutchison, Amar Saed, Meriyam Sena, Yimin Xu'
 author = 'Parham Baghbanbashi, Luca Hutchison, Amar Saed, Meriam Sena, Yimin Xu'
 release = '1.0'
 
@@ -36,12 +36,13 @@ latex_elements = {
     'papersize': 'a4paper',
     'pointsize': '10pt',
     'preamble': '',
+    'printindex': '',  # Exclude the index
+    'makeindex': '',   # Disable index generation
 }
-
 # Napoleon settings
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
-napoleon_include_init_with_doc = True
+napoleon_include_init_with_doc = False
 napoleon_include_private_with_doc = False
 napoleon_include_special_with_doc = True
 napoleon_use_admonition_for_examples = False
@@ -63,5 +64,5 @@ html_static_path = ['_static']
 # Grouping the document tree into LaTeX files
 latex_documents = [
     ('index', 'UltrasoundSim.tex', 'Ultrasound Imaging Simulator Documentation',
-     'Parham Baghbanbashi', 'manual'),
+     'Parham Baghbanbashi, Luca Hutchison, \\\\  Amar Saed, Meriam Sena, Yimin Xu', 'manual'),
 ]

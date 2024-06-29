@@ -3,17 +3,18 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Ultrasound Imaging Simulation's documentation!
+Welcome to Ultrasound Imaging Simulator's documentation!
 =========================================================
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Table of Contents:
 
+   packages
+   
 
-
-Indices and tables
-==================
+Indices and Tables For HTML Use
+===============================
 
 * :ref:`genindex`
 * :ref:`modindex`

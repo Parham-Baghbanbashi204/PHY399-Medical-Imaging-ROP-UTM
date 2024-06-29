@@ -1,3 +1,8 @@
+"""
+Main Module
+============
+This module runs the ultrasound simulation and visualization.
+"""
 from wave_propagation.propagation import Medium
 from wave_propagation.nonlinear_simulation import simulate_nonlinear_wave_propagation
 from wave_propagation.nonlinear_wave import NonlinearUltrasoundWave
@@ -26,7 +31,7 @@ def main():
     initial_amplitude = 3.0  # Adjust this value to change wave strength
 
     # Number of cycles in the ultrasound pulse
-    num_cycles = 25  # Typical value for ultrasound pulses
+    num_cycles = 3  # Typical value for ultrasound pulses
 
     # Frequency of the ultrasound wave
     frequency = 5e6  # 5 MHz

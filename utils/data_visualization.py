@@ -1,3 +1,8 @@
+"""
+Data Visualization Module
+==========================
+This module defines functions for visualizing wave and RF signal data.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegWriter

@@ -1,3 +1,8 @@
+"""
+Nonlinear Simulation Module
+============================
+This module defines functions for simulating nonlinear wave propagation.
+"""
 import numpy as np
 from wave_propagation.nonlinear_wave import NonlinearUltrasoundWave
 from wave_propagation.propagation import Medium
@@ -67,6 +72,7 @@ def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times,
          2 * results[0, 1:-1, 1:-1])
     ) * (dt**2 / dx**2)
 
+    # all subsiquent time steps
     for t_idx in range(1, nt-1):
         results[t_idx + 1, 1:-1, 1:-1] = -results[t_idx - 1, 1:-1, 1:-1] + 2 * results[t_idx, 1:-1, 1:-1] + wave.speed**2 * (
             (results[t_idx, :-2, 1:-1] + results[t_idx, 2:, 1:-1] - 2 * results[t_idx, 1:-1, 1:-1]) +

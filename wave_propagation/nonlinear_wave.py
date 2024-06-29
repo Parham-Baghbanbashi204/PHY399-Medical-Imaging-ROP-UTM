@@ -1,3 +1,8 @@
+"""
+Nonlinear Wave Module
+======================
+This module defines classes for nonlinear ultrasound waves.
+"""
 import numpy as np
 from .propagation import UltrasoundWave
 

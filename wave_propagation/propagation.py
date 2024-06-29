@@ -1,3 +1,10 @@
+"""
+Propagation Module
+===================
+This module defines classes for the medium and base ultrasound wave.
+"""
+
+
 class Medium:
     """
     Class to represent the medium in which the ultrasound wave propagates.
