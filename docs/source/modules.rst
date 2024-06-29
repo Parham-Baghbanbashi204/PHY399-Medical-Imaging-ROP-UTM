@@ -4,7 +4,7 @@ Modules
 =======
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
 .. automodule:: wave_propagation.propagation
    :members:

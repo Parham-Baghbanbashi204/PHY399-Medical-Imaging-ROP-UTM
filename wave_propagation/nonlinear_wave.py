@@ -1,6 +1,3 @@
-""" 
-Non-linar wave simulation, built on propgtion properties
-"""
 import numpy as np
 from .propagation import UltrasoundWave
 
@@ -27,7 +24,7 @@ class NonlinearUltrasoundWave(UltrasoundWave):
 
     def propagate(self, distance, time):
         """
-        Simulate the propagation of the nonlinear Gaussian wave.
+        Simulate the propagation of the nonlinear wave.
 
         :param distance: The distance over which the wave propagates.
         :type distance: float
@@ -38,10 +35,10 @@ class NonlinearUltrasoundWave(UltrasoundWave):
         """
         # Calculate the wavelength
         wavelength = self.speed / self.frequency
-        # Calculate the Gaussian envelope based on distance and time
+        # Calculate the Gaussian envelope
         envelope = np.exp(-((distance - self.speed * time)
                           ** 2) / (2 * (wavelength ** 2)))
         # Apply the nonlinearity effect
         nonlinear_effect = np.exp(-self.nonlinearity * distance)
-        # Calculate and return the amplitude of the nonlinear Gaussian wave at the given distance and time
+        # Return the resulting amplitude
         return self.amplitude * envelope * nonlinear_effect

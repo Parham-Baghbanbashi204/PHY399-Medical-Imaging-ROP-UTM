@@ -31,6 +31,13 @@ autodoc_default_options = {
     'show-inheritance': True,
 }
 
+# Add LaTeX options
+latex_elements = {
+    'papersize': 'a4paper',
+    'pointsize': '10pt',
+    'preamble': '',
+}
+
 # Napoleon settings
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
@@ -46,10 +53,15 @@ napoleon_use_rtype = True
 templates_path = ['_templates']
 exclude_patterns = []
 
-language = 'python'
+# language = 'python'
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
+# Grouping the document tree into LaTeX files
+latex_documents = [
+    ('index', 'UltrasoundSim.tex', 'Ultrasound Imaging Simulator Documentation',
+     'Parham Baghbanbashi', 'manual'),
+]
