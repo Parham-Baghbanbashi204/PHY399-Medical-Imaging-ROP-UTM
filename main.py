@@ -13,9 +13,12 @@ def main():
     medium = Medium(density=1000, sound_speed=1500)
 
     # Define simulation parameters
-    x_points = np.linspace(0, 500, 500)  # in mm
-    z_points = np.linspace(0, 500, 500)  # in mm
-    times = np.linspace(0, 1e-6, 340)    # in seconds
+    # Reduce the number of spatial points to speed up simulation
+    x_points = np.linspace(0, 500, 250)  # in mm
+    # Reduce the number of spatial points to speed up simulation
+    z_points = np.linspace(0, 500, 250)  # in mm
+    # Reduce the number of time steps to speed up simulation
+    times = np.linspace(0, 1e-6, 170)  # in sec
 
     # Define scatterer and receiver positions
     scatterer_pos = (200, 200)  # in mm
