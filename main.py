@@ -7,7 +7,7 @@ import numpy as np
 from wave_propagation.propagation import Medium
 from wave_propagation.nonlinear_wave import NonlinearUltrasoundWave
 from utils.data_visualization import animate_wave
-from wave_propagation.nonlinear_simulation import simulate_nonlinear_wave_propagation_leapfrog
+from wave_propagation.nonlinear_simulation import simulate_nonlinear_wave_propagation_leapfrog, simulate_2d_wave_equation_solve_ivp
 
 
 def main():
@@ -47,6 +47,8 @@ def main():
     # Ensure propagation_results has the correct shape
     assert propagation_results.shape == (len(times), len(x_points), len(
         z_points)), "Shape of propagation_results is incorrect"
+
+    print(propagation_results)
 
     # Animate the wave propagation
     animate_wave(propagation_results, x_points, z_points,
