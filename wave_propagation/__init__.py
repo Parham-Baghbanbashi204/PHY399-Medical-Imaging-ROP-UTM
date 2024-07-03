@@ -1,3 +1,8 @@
+"""
+Wave Proagation
+===============
+Simple Wave propgation module for a pressure wave to be updated
+"""
 # This makes the modules available at the package level
 
 from .propagation import UltrasoundWave, Medium
