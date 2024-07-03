@@ -8,9 +8,36 @@ from wave_propagation.nonlinear_wave import NonlinearUltrasoundWave
 from wave_propagation.propagation import Medium
 
 
-def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, num_cycles=3):
+def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times, scatterer_pos, inital_amplitude=0.1, num_cycles=3):
+    """ 
+    Use Scipy to solve the pressure wave using coupled ODE's 
+
+     :param wave: An instance of NonlinearUltrasoundWave.
+     :type wave: NonlinearUltrasoundWave
+     :param medium: An instance of Medium.
+     :type medium: Medium
+     :param x_points: 1D array of spatial points along x-dimension.
+     :type x_points: numpy.ndarray
+     :param z_points: 1D array of spatial points along z-dimension.
+     :type z_points: numpy.ndarray
+     :param times: 1D array of time points.
+     :type times: numpy.ndarray
+     :param scatterer_pos: Tuple of the scatterer's position (x, z).
+     :type scatterer_pos: tuple
+     :param initial_amplitude: Initial amplitude of the wave (representing voltage).
+     :type initial_amplitude: float
+     :param num_cycles: Number of cycles in the ultrasound pulse.
+     :type num_cycles: int
+     :return: A 3D array of wave amplitudes over time and space.
+     :rtype: numpy.ndarray
     """
-    Simulate nonlinear wave propagation in a medium using the leapfrog method. FILLER CODE FROM THE INTERNET TO TEST THE DATA VISUALIZER
+
+    pass
+
+
+def simulate_nonlinear_wave_propagation_leapfrog(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, num_cycles=3):
+    """
+    Simulate nonlinear wave propagation in a medium using the leapfrog method. This function helps us understand how scipy will solve ode's
 
     :param wave: An instance of NonlinearUltrasoundWave.
     :type wave: NonlinearUltrasoundWave

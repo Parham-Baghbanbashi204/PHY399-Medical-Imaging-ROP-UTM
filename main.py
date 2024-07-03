@@ -7,7 +7,7 @@ import numpy as np
 from wave_propagation.propagation import Medium
 from wave_propagation.nonlinear_wave import NonlinearUltrasoundWave
 from utils.data_visualization import animate_wave
-from wave_propagation.nonlinear_simulation import simulate_nonlinear_wave_propagation
+from wave_propagation.nonlinear_simulation import simulate_nonlinear_wave_propagation_leapfrog
 
 
 def main():
@@ -41,7 +41,7 @@ def main():
         frequency=frequency, amplitude=initial_amplitude, speed=medium.sound_speed, nonlinearity=0.01)
 
     # Simulate the wave propagation and get the results as a 3D array
-    propagation_results = simulate_nonlinear_wave_propagation(
+    propagation_results = simulate_nonlinear_wave_propagation_leapfrog(
         wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude, num_cycles)
 
     # Ensure propagation_results has the correct shape
