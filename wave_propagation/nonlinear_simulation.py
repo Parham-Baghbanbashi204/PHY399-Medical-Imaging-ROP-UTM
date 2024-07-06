@@ -113,88 +113,34 @@ def simulate_nonlinear_wave_propagation_leapfrog(wave, medium, x_points, z_point
     return results
 
 
-def solve_2d_wave_equation(c, x_points, y_points, times, s, initial_p=None, initial_dpdt=None):
+def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos, inital_amplitude=0.1):
     """
-    Solve the 2D wave equation using solve_ivp.
+    Simulate nonlinear wave propagation in a medium using the leapfrog method. This function helps us understand how scipy will solve ode's
 
-    :param c: Wave speed.
-    :type c: float
+    :param wave: An instance of NonlinearUltrasoundWave.
+    :type wave: NonlinearUltrasoundWave
+    :param medium: An instance of Medium.
+    :type medium: Medium
     :param x_points: 1D array of spatial points along x-dimension.
     :type x_points: numpy.ndarray
-    :param y_points: 1D array of spatial points along y-dimension.
-    :type y_points: numpy.ndarray
+    :param z_points: 1D array of spatial points along z-dimension.
+    :type z_points: numpy.ndarray
     :param times: 1D array of time points.
     :type times: numpy.ndarray
-    :param s: Source term function s(x, y, t).
-    :type s: function
-    :param initial_p: Initial condition for p(x, y).
-    :type initial_p: numpy.ndarray, optional
-    :param initial_dpdt: Initial condition for dp/dt(x, y).
-    :type initial_dpdt: numpy.ndarray, optional
+    :param scatterer_pos: Tuple of the scatterer's position (x, z).
+    :type scatterer_pos: tuple
+    :param initial_amplitude: Initial amplitude of the wave (representing voltage).
+    :type initial_amplitude: float
     :return: A 3D array of wave amplitudes over time and space.
     :rtype: numpy.ndarray
     """
+    # Discretize the pressure wave
+
+    # Determine the number of points along each dimension
     nx = len(x_points)
-    ny = len(y_points)
+    nz = len(z_points)
     nt = len(times)
-    dx = x_points[1] - x_points[0]
-    dy = y_points[1] - y_points[0]
 
-    # Initialize p and dp/dt
-    if initial_p is None:
-        initial_p = np.zeros((nx, ny))
-    if initial_dpdt is None:
-        initial_dpdt = np.zeros((nx, ny))
-
-    # Flatten the initial conditions
-    u0 = np.concatenate([initial_p.ravel(), initial_dpdt.ravel()])
-
-    def wave_equation(t, u):
-        p = u[:nx*ny].reshape((nx, ny))
-        dpdt = u[nx*ny:].reshape((nx, ny))
-
-        d2pdt2 = np.zeros_like(p)
-        laplacian_p = np.zeros_like(p)
-
-        # Compute the Laplacian using finite differences
-        laplacian_p[1:-1, 1:-1] = (
-            (p[:-2, 1:-1] + p[2:, 1:-1] - 2 * p[1:-1, 1:-1]) / dx**2 +
-            (p[1:-1, :-2] + p[1:-1, 2:] - 2 * p[1:-1, 1:-1]) / dy**2
-        )
-
-        # Update d2pdt2 with the wave equation
-        d2pdt2[1:-1, 1:-1] = c**2 * laplacian_p[1:-1, 1:-1] + \
-            s(x_points[1:-1][:, None], y_points[1:-1][None, :], t)
-
-        # Flatten the derivatives
-        du_dt = np.concatenate([dpdt.ravel(), d2pdt2.ravel()])
-        return du_dt
-
-    # Solve the wave equation using solve_ivp
-    sol = solve_ivp(
-        wave_equation, [times[0], times[-1]], u0, t_eval=times, method='RK45')
-
-    # Extract the results
-    results = np.zeros((nt, nx, ny))
-    for t_idx, t in enumerate(sol.t):
-        results[t_idx] = sol.y[:nx*ny, t_idx].reshape((nx, ny))
-
-    return results
-
-# Define the source term s(x, y, t)
-
-
-def source_term(x, y, t):
-    return np.sin(x) * np.cos(y) * np.exp(-t)
-
-
-# Example usage
-x_points = np.linspace(0, 1, 50)
-y_points = np.linspace(0, 1, 50)
-times = np.linspace(0, 1, 100)
-c = 1.0  # Wave speed
-
-# Solve the wave equation
-results = solve_2d_wave_equation(c, x_points, y_points, times, source_term)
-
-# The results array contains the wave amplitudes over time and space
+    # Initialize a 3D array to store the results
+    p = np.zeros((nt, nx, nz))
+    
