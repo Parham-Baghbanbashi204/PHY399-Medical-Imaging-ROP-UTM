@@ -21,14 +21,14 @@ def main():
     x_points = np.linspace(0, 100, 100)  # 500 points along x-dimension in mm
     # 500 points along z-dimension (depth) in mm
     z_points = np.linspace(0, 100, 100)
-    times = np.linspace(0, 1e-6, 500)    # 500 time steps up to 1 microsecond
+    times = np.linspace(0, 1e-6, 300)    # 500 time steps up to 1 microsecond
 
     # Define scatterer and receiver positions
     scatterer_pos = [(50, 50)]  # in mm
     receiver_pos = (75, 75)   # in mm
 
     # Initial amplitude (representing voltage)
-    initial_amplitude = 3.0  # Adjust this value to change wave strength
+    initial_amplitude = 30  # Adjust this value to change wave strength
 
     # Frequency of the ultrasound wave
     frequency = 5e6  # 5 MHz
@@ -38,22 +38,23 @@ def main():
         frequency=frequency, amplitude=initial_amplitude, speed=medium.sound_speed, nonlinearity=0.01)
 
     # Simulate the wave propagation and get the results as a 3D array
-    propagation_results = simulate_using_steps(
+    wavefield = simulate_using_steps(
         wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude)
 
-    # Ensure propagation_results has the correct shape
-    # assert propagation_results.shape == (len(times), len(x_points), len(
-    #     z_points)), "Shape of propagation_results is incorrect"
+    # Ensure the wavefield has the correct shape
+    # assert wavefield.shape == (len(times), len(z_points), len(
+    #     x_points)), "Shape of wavefield is incorrect"
 
-    # Debugging: Print propagation results summary
-    print("Propagation Results Summary:")
-    print("Min value:", np.min(propagation_results))
-    print("Max value:", np.max(propagation_results))
-    print("Mean value:", np.mean(propagation_results))
-    print(propagation_results)
+    # Debugging: Print wavefield summary
+    print("Wavefield Summary:")
+    print("Min value:", np.min(wavefield))
+    print("Max value:", np.max(wavefield))
+    print("Mean value:", np.mean(wavefield))
+    print("RAW Values:", wavefield)
 
     # Animate the wave propagation
-    animate_wave(propagation_results, x_points, z_points,
+    print("Rendering Animation")
+    animate_wave(wavefield, x_points, z_points,
                  times, scatterer_pos, receiver_pos)
 
 
