@@ -24,11 +24,12 @@ def main():
     times = np.linspace(0, 1e-6, 300)    # 500 time steps up to 1 microsecond
 
     # Define scatterer and receiver positions
-    scatterer_pos = [(50, 50)]  # in mm
-    receiver_pos = (75, 75)   # in mm
+    # RN the way this is is (x,z)
+    scatterer_pos = (40, 40)  # in mm
+    receiver_pos = (75, 55)   # in mm
 
     # Initial amplitude (representing voltage)
-    initial_amplitude = 30  # Adjust this value to change wave strength
+    initial_amplitude = 3  # Adjust this value to change wave strength
 
     # Frequency of the ultrasound wave
     frequency = 5e6  # 5 MHz

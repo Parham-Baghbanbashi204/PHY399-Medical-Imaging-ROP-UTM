@@ -258,9 +258,46 @@ def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos,
         return left_side, right_side
 
     # Define the initial pressure wave function
-    def initial_pressure_wave(x, z):
-        # Example: A Gaussian pulse as the initial condition
-        return np.exp(-((x-5)**2 + (z-5)**2))
+    def initial_pressure_wave(x, z, t, amplitude, frequency, cycles, width, center_x, center_z):
+        """
+        Generate an initial pressure wave with control over amplitude, frequency, and pulsing in cycles.
+
+        :param x: x position.
+        :type x: float
+        :param z: z position.
+        :type z: float
+        :param t: Time.
+        :type t: float
+        :param amplitude: Amplitude of the wave.
+        :type amplitude: float
+        :param frequency: Frequency of the wave.
+        :type frequency: float
+        :param cycles: Number of cycles in the pulse.
+        :type cycles: int
+        :param width: Width of the Gaussian envelope.
+        :type width: float
+        :param center_x: Center position of the Gaussian envelope in x.
+        :type center_x: float
+        :param center_z: Center position of the Gaussian envelope in z.
+        :type center_z: float
+        :return: Initial pressure wave value.
+        :rtype: float
+        """
+        # Sinusoidal function for the pulsing behavior
+        sine_wave = np.cos(2 * np.pi * frequency * t)
+
+        # Gaussian envelope for the spatial distribution
+        gaussian_envelope = np.exp(-((x - center_x) **
+                                   2 + (z - center_z)**2) / (2 * width**2))  # pulled out / (2 * width**2)
+
+        # Combine both to form the initial pressure wave
+        # return amplitude * sine_wave * gaussian_envelope
+        return amplitude * sine_wave * gaussian_envelope
+
+    # Define the initial pressure wave function - THIS WORKS
+    # def initial_pressure_wave_pos(x, z, cx, cz):
+    #     # Example: A Gaussian pulse as the initial condition
+    #     return np.exp(-((x-cx)**2 + (z-cz)**2)) * np.cos(2 * np.pi * 5e6 * 0 * 1)
 
     # Define parameters
     c = 1.0      # Wave speed constant
@@ -270,14 +307,28 @@ def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos,
     nx = len(x_points)     # Number of x points
     nz = len(z_points)     # Number of z points
     nt = len(times)     # Number of time steps
-    # Initialize pressure wave array to store all time steps
+    # Parameters for the initial wave function
+    amplitude = wave.amplitude     # Amplitude of the wave
+    frequency = wave.frequency     # Frequency of the wave
+    cycles = 4         # Number of cycles in the pulse ensure <= 1
+    # Width of the Gaussian envelope to cover the grid
+    width = 0.5
+    # Center position of the Gaussian envelope in x
+    
+    center_x = scatterer_pos[0]
+    # Center position of the Gaussian envelope in z
+    center_z = scatterer_pos[1]
+
     p = np.zeros((nt, nx, nz))
 
     # Set initial conditions
     for i in range(nx):
         for j in range(nz):
-            p[0, i, j] = initial_pressure_wave(i * dx, j * dz)
+            p[0, i, j] = initial_pressure_wave(
+                i * dx, j*dz, 0, amplitude, frequency, cycles, width, center_x*10**-1, center_z*10**-1)
             p[1, i, j] = p[0, i, j]  # Initial condition for the second time step
+
+    print("INITAL CONDITIONS:", p[0, :, :])
 
     # Run the simulation
     for n in range(1, nt-1):
@@ -296,9 +347,11 @@ def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos,
                     p[n+1, i, j], p[n, i, j], p[n-1, i, j],
                     c, partial_x, partial_z, s, dt
                 )
+                # take only the right side for our data
                 p[n+1, i, j] = right_side * dt**2 + \
                     2 * p[n, i, j] - p[n-1, i, j]
 
     # p now contains the pressure wave values for all time steps and spatial points
 
     return p
+
