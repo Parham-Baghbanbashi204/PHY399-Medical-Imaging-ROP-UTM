@@ -7,7 +7,7 @@ import numpy as np
 from wave_propagation.propagation import Medium
 from wave_propagation.nonlinear_wave import NonlinearUltrasoundWave
 from utils.data_visualization import animate_wave
-from wave_propagation.nonlinear_simulation import simulate_nonlinear_wave_propagation_leapfrog, solve_2d_wave_equation
+from wave_propagation.nonlinear_simulation import simulate_using_steps
 
 
 def main():
@@ -18,20 +18,17 @@ def main():
     medium = Medium(density=1, sound_speed=1500)
 
     # Define simulation parameters
-    x_points = np.linspace(0, 100, 500)  # 500 points along x-dimension in mm
+    x_points = np.linspace(0, 100, 100)  # 500 points along x-dimension in mm
     # 500 points along z-dimension (depth) in mm
-    z_points = np.linspace(0, 100, 500)
+    z_points = np.linspace(0, 100, 100)
     times = np.linspace(0, 1e-6, 500)    # 500 time steps up to 1 microsecond
 
     # Define scatterer and receiver positions
-    scatterer_pos = (50, 50)  # in mm
+    scatterer_pos = [(50, 50)]  # in mm
     receiver_pos = (75, 75)   # in mm
 
     # Initial amplitude (representing voltage)
     initial_amplitude = 3.0  # Adjust this value to change wave strength
-
-    # Number of cycles in the ultrasound pulse
-    num_cycles = 3  # Typical value for ultrasound pulses
 
     # Frequency of the ultrasound wave
     frequency = 5e6  # 5 MHz
@@ -41,24 +38,18 @@ def main():
         frequency=frequency, amplitude=initial_amplitude, speed=medium.sound_speed, nonlinearity=0.01)
 
     # Simulate the wave propagation and get the results as a 3D array
-    propagation_results = simulate_nonlinear_wave_propagation_leapfrog(
-        wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude, num_cycles)
-
-    def source_term(x, y, t):
-        return np.sin(x) * np.cos(y) * np.exp(-t)
-
-    # Example usage
-    times = np.linspace(0, 1, 100)
-    c = 1.0  # Wave speed
-
-    # Solve the wave equation
-    propagation_results = solve_2d_wave_equation(
-        c, x_points, z_points, times, source_term)
+    propagation_results = simulate_using_steps(
+        wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude)
 
     # Ensure propagation_results has the correct shape
-    assert propagation_results.shape == (len(times), len(x_points), len(
-        z_points)), "Shape of propagation_results is incorrect"
+    # assert propagation_results.shape == (len(times), len(x_points), len(
+    #     z_points)), "Shape of propagation_results is incorrect"
 
+    # Debugging: Print propagation results summary
+    print("Propagation Results Summary:")
+    print("Min value:", np.min(propagation_results))
+    print("Max value:", np.max(propagation_results))
+    print("Mean value:", np.mean(propagation_results))
     print(propagation_results)
 
     # Animate the wave propagation

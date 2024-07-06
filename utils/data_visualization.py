@@ -35,7 +35,7 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     fig, ax = plt.subplots()
 
     # Define the colormap with a center value of white
-    cmap = plt.get_cmap('seismic') #type:ignore
+    cmap = plt.get_cmap('seismic')  # type:ignore
     norm = mcolors.TwoSlopeNorm(
         vmin=-wave_data.max(), vcenter=0, vmax=wave_data.max())
 
@@ -45,7 +45,8 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     colorbar = fig.colorbar(cax, ax=ax, label='Amplitude')
 
     # Add scatterer and receiver markers
-    ax.plot(scatterer_pos[0], scatterer_pos[1], 'ro', label='Scatterer')
+    for pos in scatterer_pos:
+        ax.plot(pos[0], pos[1], 'ro', label='Scatterer')
     ax.plot(receiver_pos[0], receiver_pos[1], 'ks', label='Receiver')
 
     # Add legend

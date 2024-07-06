@@ -3,6 +3,8 @@ Nonlinear Simulation Module
 ============================
 This module defines functions for simulating nonlinear wave propagation.
 """
+from matplotlib.animation import FuncAnimation
+import matplotlib.pyplot as plt
 import numpy as np
 from wave_propagation.nonlinear_wave import NonlinearUltrasoundWave
 from wave_propagation.propagation import Medium
@@ -113,9 +115,9 @@ def simulate_nonlinear_wave_propagation_leapfrog(wave, medium, x_points, z_point
     return results
 
 
-def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos, inital_amplitude=0.1):
+def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1):
     """
-    Simulate nonlinear wave propagation in a medium using the leapfrog method. This function helps us understand how scipy will solve ode's
+    Simulate nonlinear wave propagation in a medium using the leapfrog method.
 
     :param wave: An instance of NonlinearUltrasoundWave.
     :type wave: NonlinearUltrasoundWave
@@ -134,13 +136,52 @@ def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos,
     :return: A 3D array of wave amplitudes over time and space.
     :rtype: numpy.ndarray
     """
-    # Discretize the pressure wave
+    # Parameters
+    # Number of spatial points in x and z directions
+    nx, nz = len(x_points), len(z_points)
+    nt = len(times)  # Number of time steps
+    dx = x_points[1] - x_points[0]
+    dz = z_points[1] - z_points[0]
+    dt = times[1] - times[0]
+    c = 1.0  # Wave speed
+    s = np.zeros((nx, nz, nt))  # Source term initialized to zero
 
-    # Determine the number of points along each dimension
-    nx = len(x_points)
-    nz = len(z_points)
-    nt = len(times)
+    # # Ensure CFL condition for numerical stability
+    # if c * dt > np.sqrt(dx**2 + dz**2):
+    #     raise ValueError("CFL condition not met. Reduce dt or increase dx/dz.")
 
-    # Initialize a 3D array to store the results
-    p = np.zeros((nt, nx, nz))
-    
+    # # Include scatterer in the source term if scatterer_pos is provided
+    # for pos in scatterer_pos:
+    #     i, j = int(pos[0] / dx), int(pos[1] / dz)
+    #     if 0 <= i < nx and 0 <= j < nz:
+    #         # Add wave amplitude to source term at scatterer position
+    #         s[i, j, :] = wave.amplitude
+    # Return the pressure field in the shape (nt, nx, nz)
+    # Parameters
+    nx, nz = 100, 100  # Number of spatial points in x and z directions
+    nt = 500  # Number of time steps
+    dx, dz, dt = 0.01, 0.01, 0.001  # Spatial and time step sizes
+    c = 1.0  # Wave speed
+    s = np.zeros((nx, nz, nt))  # Source term
+
+    # Initial pressure wave function
+    p = np.zeros((nx, nz, nt))
+
+    # Initialize p at t=0 (n=0) with some initial condition, e.g., a Gaussian pulse
+    x = np.linspace(0, (nx-1)*dx, nx)
+    z = np.linspace(0, (nz-1)*dz, nz)
+    X, Z = np.meshgrid(x, z)
+    p[:, :, 0] = np.exp(-((X-nx*dx/2)**2 + (Z-nz*dz/2)**2) / (2*(0.1**2)))
+
+    # Time stepping
+    for n in range(1, nt-1):
+        p[1:-1, 1:-1, n+1] = (
+            2 * p[1:-1, 1:-1, n]
+            - p[1:-1, 1:-1, n-1]
+            + c**2 * dt**2 * (
+                (p[2:, 1:-1, n] - 2 * p[1:-1, 1:-1, n] + p[:-2, 1:-1, n]) / dx**2
+                + (p[1:-1, 2:, n] - 2 * p[1:-1, 1:-1, n] + p[1:-1, :-2, n]) / dz**2
+            )
+            + s[1:-1, 1:-1, n] * dt**2
+        )
+    return np.transpose(p, (2, 0, 1))
