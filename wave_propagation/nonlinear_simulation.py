@@ -354,11 +354,11 @@ def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos,
     return p
 
 
-#TODO ADD Source term
+# TODO ADD Source term
 @run_on_gpu
-def simulate_using_steps_optimized(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, pulse_width=0.5, cycles=1):
+def simulate_using_steps_optimized_no_src(wave, medium, x_points, z_points, times, scatterer_pos, dx, dz, dt, initial_amplitude=0.1, pulse_width=0.5, cycles=1):
     """
-    Simulate pressure wave propagation using partial derivatives, optimized version of the orignal function using vectorization, the orignal is easier to read and this one runs faster
+    Simulate pressure wave propagation using partial derivatives, optimized version of the orignal function using vectorization, the orignal is easier to read and this one runs faster, no source term
 
     :param wave: An instance of NonlinearUltrasoundWave.
     :type wave: NonlinearUltrasoundWave
@@ -378,13 +378,13 @@ def simulate_using_steps_optimized(wave, medium, x_points, z_points, times, scat
     :rtype: numpy.ndarray
     """
     v = medium.sound_speed
-    dt = 0.001
+    dt = 0.001  # TODO figure out how to discretize without breaking everything this is just working so I might not touch it as long as the timesteps for x and z are consistant itll work
     dx = 0.1
     dz = 0.1
     nx = len(x_points)
     nz = len(z_points)
     nt = len(times)
-    amplitude = 7e-8
+    amplitude = wave.amplitude
     frequency = wave.frequency
     width = 1.0 / medium.density
     c = v / (dx / dt)
@@ -412,5 +412,216 @@ def simulate_using_steps_optimized(wave, medium, x_points, z_points, times, scat
         right_side = c**2 * (partial_x + partial_z)
         p[n + 1, 1:-1, 1:-1] = right_side * dt**2 + \
             2 * p[n, 1:-1, 1:-1] - p[n - 1, 1:-1, 1:-1]
+
+    return p
+
+
+@run_on_gpu
+def simulate_using_steps_optimized_no_src_auto(wave, medium, x_start, x_stop, x_steps, z_start, z_stop, z_steps, t_start, t_stop, t_steps, scatterer_pos, initial_amplitude=0.1, pulse_width=0.5, cycles=1):
+    """
+    Simulate pressure wave propagation using partial derivatives, optimized version of the original function using vectorization, with no source term.
+
+    :param wave: An instance of NonlinearUltrasoundWave.
+    :type wave: NonlinearUltrasoundWave
+    :param medium: An instance of Medium.
+    :type medium: Medium
+    :param x_start: Start value for the x-dimension.
+    :type x_start: float
+    :param x_stop: Stop value for the x-dimension.
+    :type x_stop: float
+    :param x_steps: Number of steps in the x-dimension.
+    :type x_steps: int
+    :param z_start: Start value for the z-dimension.
+    :type z_start: float
+    :param z_stop: Stop value for the z-dimension.
+    :type z_stop: float
+    :param z_steps: Number of steps in the z-dimension.
+    :type z_steps: int
+    :param t_start: Start value for the time domain.
+    :type t_start: float
+    :param t_stop: Stop value for the time domain.
+    :type t_stop: float
+    :param t_steps: Number of steps in the time domain.
+    :type t_steps: int
+    :param scatterer_pos: Tuple of the scatterer's position (x, z).
+    :type scatterer_pos: tuple
+    :param initial_amplitude: Initial amplitude of the wave (representing voltage).
+    :type initial_amplitude: float
+    :return: A 3D array of wave amplitudes over time and space.
+    :rtype: numpy.ndarray
+    """
+    v = medium.sound_speed
+
+    # Calculate dx, dz, and dt based on the provided start, stop, and steps
+    dx = (x_stop - x_start) / (x_steps - 1)
+    dz = (z_stop - z_start) / (z_steps - 1)
+    dt = (t_stop - t_start) / (t_steps - 1)
+
+    nx = x_steps
+    nz = z_steps
+    nt = t_steps
+    amplitude = wave.amplitude
+    frequency = wave.frequency
+    width = 1.0 / medium.density
+    c = v / (dx / dt)
+    cfl_number = c * dt / min(dx, dz)
+
+    if cfl_number > 1:
+        raise ValueError(
+            "CFL condition not satisfied. Reduce the time step size or increase the spatial step size.")
+
+    center_x, center_z = scatterer_pos
+    p = np.zeros((nt, nx, nz))
+
+    X, Z = np.meshgrid(np.linspace(x_start, x_stop, nx),
+                       np.linspace(z_start, z_stop, nz), indexing='ij')
+    sine_wave = np.cos(2 * np.pi * frequency * 0)
+    gaussian_envelope = np.exp(-((X - center_x) **
+                               2 + (Z - center_z)**2) / (2 * width**2))
+    p[0] = amplitude * sine_wave * gaussian_envelope
+    p[1] = p[0]
+
+    for n in tqdm(range(1, nt - 1), desc="Simulation Progress"):
+        partial_x = (p[n, 2:, 1:-1] - 2 * p[n, 1:-1, 1:-1] +
+                     p[n, :-2, 1:-1]) / dx**2
+        partial_z = (p[n, 1:-1, 2:] - 2 * p[n, 1:-1, 1:-1] +
+                     p[n, 1:-1, :-2]) / dz**2
+        right_side = c**2 * (partial_x + partial_z)
+        p[n + 1, 1:-1, 1:-1] = right_side * dt**2 + \
+            2 * p[n, 1:-1, 1:-1] - p[n - 1, 1:-1, 1:-1]
+
+    return p
+
+
+@run_on_gpu
+def simulate_using_steps_optimized_with_cont_src(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, pulse_width=0.5, cycles=1):
+    """
+    Simulate pressure wave propagation using partial derivatives, optimized version of the original function using vectorization, with a point source term.
+
+    :param wave: An instance of NonlinearUltrasoundWave.
+    :type wave: NonlinearUltrasoundWave
+    :param medium: An instance of Medium.
+    :type medium: Medium
+    :param x_points: 1D array of spatial points along x-dimension.
+    :type x_points: numpy.ndarray
+    :param z_points: 1D array of spatial points along z-dimension.
+    :type z_points: numpy.ndarray
+    :param times: 1D array of time points.
+    :type times: numpy.ndarray
+    :param scatterer_pos: Tuple of the scatterer's position (x, z).
+    :type scatterer_pos: tuple
+    :param initial_amplitude: Initial amplitude of the wave (representing voltage).
+    :type initial_amplitude: float
+    :return: A 3D array of wave amplitudes over time and space.
+    :rtype: numpy.ndarray
+    """
+    v = medium.sound_speed
+    dt = 0.001
+    dx = 0.1
+    dz = 0.1
+    nx = len(x_points)
+    nz = len(z_points)
+    nt = len(times)
+    amplitude = initial_amplitude
+    frequency = wave.frequency
+    c = v / (dx / dt)
+    cfl_number = c * dt / min(dx, dz)
+
+    if cfl_number > 1:
+        raise ValueError(
+            "CFL condition not satisfied. Reduce the time step size or increase the spatial step size.")
+
+    center_x, center_z = scatterer_pos
+    p = np.zeros((nt, nx, nz))
+
+    for n in tqdm(range(1, nt - 1), desc="Simulation Progress"):
+        partial_x = (p[n, 2:, 1:-1] - 2 * p[n, 1:-1, 1:-1] +
+                     p[n, :-2, 1:-1]) / dx**2
+        partial_z = (p[n, 1:-1, 2:] - 2 * p[n, 1:-1, 1:-1] +
+                     p[n, 1:-1, :-2]) / dz**2
+        right_side = c**2 * (partial_x + partial_z)
+
+        # Final Equation without source term
+        p[n + 1, 1:-1, 1:-1] = right_side * dt**2 + \
+            2 * p[n, 1:-1, 1:-1] - p[n - 1, 1:-1, 1:-1]
+
+        # Add source term
+        source_term = amplitude * np.cos(2 * np.pi * frequency * times[n])
+        p[n + 1, center_x, center_z] += source_term
+
+    return p
+
+
+@run_on_gpu
+def simulate_using_steps_optimized_with_pulse_source(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, pulse_width=0.5, cycles=1):
+    """
+    Simulate pressure wave propagation using partial derivatives, optimized version of the original function using vectorization, with a pulse source term.
+
+    :param wave: An instance of NonlinearUltrasoundWave.
+    :type wave: NonlinearUltrasoundWave
+    :param medium: An instance of Medium.
+    :type medium: Medium
+    :param x_points: 1D array of spatial points along x-dimension.
+    :type x_points: numpy.ndarray
+    :param z_points: 1D array of spatial points along z-dimension.
+    :type z_points: numpy.ndarray
+    :param times: 1D array of time points.
+    :type times: numpy.ndarray
+    :param scatterer_pos: Tuple of the scatterer's position (x, z).
+    :type scatterer_pos: tuple
+    :param initial_amplitude: Initial amplitude of the wave (representing voltage).
+    :type initial_amplitude: float
+    :param pulse_width: Width of the Gaussian pulse.
+    :type pulse_width: float
+    :param cycles: Number of cycles in the pulse.
+    :type cycles: int
+    :return: A 3D array of wave amplitudes over time and space.
+    :rtype: numpy.ndarray
+    """
+    v = medium.sound_speed
+    dt = 0.001
+    dx = 0.1
+    dz = 0.1
+    nx = len(x_points)
+    nz = len(z_points)
+    nt = len(times)
+    amplitude = initial_amplitude
+    frequency = wave.frequency
+    c = v / (dx / dt)  # wave speed
+    cfl_number = c * dt / min(dx, dz)
+
+    if cfl_number > 1:
+        raise ValueError(
+            "CFL condition not satisfied. Reduce the time step size or increase the spatial step size.")
+
+    center_x, center_z = scatterer_pos
+    p = np.zeros((nt, nx, nz))
+
+    X, Z = np.meshgrid(np.arange(nx) * dx, np.arange(nz) * dz, indexing='ij')
+    sine_wave = np.cos(2 * np.pi * frequency * 0)
+    gaussian_envelope = np.exp(-((X - center_x * dx) **
+                               2 + (Z - center_z * dz)**2) / (2 * pulse_width**2))
+    p[0] = amplitude * sine_wave * gaussian_envelope
+    p[1] = p[0]
+
+    # Creating the Gaussian pulse source term
+    src = amplitude * \
+        np.exp(-((np.arange(nt) - nt // 2)**2) / (2 * pulse_width**2))
+    sine_wave = np.sin(2 * np.pi * frequency * times)
+    pulse = src
+
+    for n in tqdm(range(1, nt - 1), desc="Simulation Progress"):
+        partial_x = (p[n, 2:, 1:-1] - 2 * p[n, 1:-1, 1:-1] +
+                     p[n, :-2, 1:-1]) / dx**2
+        partial_z = (p[n, 1:-1, 2:] - 2 * p[n, 1:-1, 1:-1] +
+                     p[n, 1:-1, :-2]) / dz**2
+        right_side = c**2 * (partial_x + partial_z)
+
+        # Final Equation without source term
+        p[n + 1, 1:-1, 1:-1] = right_side * dt**2 + \
+            2 * p[n, 1:-1, 1:-1] - p[n - 1, 1:-1, 1:-1]
+
+        # Add pulse source term
+        p[n + 1, center_x, center_z] += pulse[n]
 
     return p

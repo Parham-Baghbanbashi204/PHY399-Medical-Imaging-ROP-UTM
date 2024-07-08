@@ -41,8 +41,9 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     # Define the colormap with a center value of white
     cmap = plt.get_cmap('seismic_r')
 
-    # Determine the max and min amplitude for the color scale
-    vmin, vmax = wave_data.min(), wave_data.max()
+    # Determine the max amplitude for the color scale
+    max_val = np.max(np.abs(wave_data))
+    vmin, vmax = -max_val, max_val
     norm = mcolors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
 
     # Create the initial plot with a color bar
@@ -82,7 +83,7 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
         ax_wave.set_xlabel('x-dimension (mm)')
         ax_wave.set_ylabel('z-dimension (depth in mm)')
 
-        # Update the seismogram - this is how we record the radiofrequency signal #TODO make this independant so we can add multiple recivers
+        # Update the seismogram
         seismogram.set_data(
             times[:frame], wave_data[:frame, receiver_pos[0], receiver_pos[1]])
         ax_signal.set_xlim(0, times[frame])
