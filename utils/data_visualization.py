@@ -8,8 +8,10 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from matplotlib.animation import FuncAnimation, FFMpegWriter
 import matplotlib.colors as mcolors
+from utils.run_on_gpu import run_on_gpu
 
 
+@run_on_gpu
 def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_pos, interval=20, title='Wave Animation'):
     """
     Animates the wave data over time, highlighting the first peak and first trough as expanding rings.

@@ -16,6 +16,7 @@ from scipy.integrate import solve_ivp
 import pandas as pd
 from tqdm import tqdm
 import math
+from utils.run_on_gpu import run_on_gpu
 
 
 def simulate_nonlinear_wave_propagation_leapfrog(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, num_cycles=3):
@@ -93,6 +94,7 @@ def simulate_nonlinear_wave_propagation_leapfrog(wave, medium, x_points, z_point
     return results
 
 
+@run_on_gpu  # RUN THE SIM USING THE GPU
 def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, pulse_width=0.5, cycles=1):
     """
     Simulate preasure wave propgation using partial dirivitives.
@@ -349,4 +351,65 @@ def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos,
 
     # p now contains the pressure wave values for all time steps and spatial points
     print("finished processing")
+    return p
+
+
+@run_on_gpu
+def simulate_using_steps_optimized(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, pulse_width=0.5, cycles=1):
+    """
+    Simulate pressure wave propagation using partial derivatives, optimized version of the orignal function using vectorization, the orignal is easier to read and this one runs faster
+
+    :param wave: An instance of NonlinearUltrasoundWave.
+    :type wave: NonlinearUltrasoundWave
+    :param medium: An instance of Medium.
+    :type medium: Medium
+    :param x_points: 1D array of spatial points along x-dimension.
+    :type x_points: numpy.ndarray
+    :param z_points: 1D array of spatial points along z-dimension.
+    :type z_points: numpy.ndarray
+    :param times: 1D array of time points.
+    :type times: numpy.ndarray
+    :param scatterer_pos: Tuple of the scatterer's position (x, z).
+    :type scatterer_pos: tuple
+    :param initial_amplitude: Initial amplitude of the wave (representing voltage).
+    :type initial_amplitude: float
+    :return: A 3D array of wave amplitudes over time and space.
+    :rtype: numpy.ndarray
+    """
+    v = medium.sound_speed
+    dt = 0.001
+    dx = 0.1
+    dz = 0.1
+    nx = len(x_points)
+    nz = len(z_points)
+    nt = len(times)
+    amplitude = 7e-8
+    frequency = wave.frequency
+    width = 1.0 / medium.density
+    c = v / (dx / dt)
+    cfl_number = c * dt / min(dx, dz)
+
+    if cfl_number > 1:
+        raise ValueError(
+            "CFL condition not satisfied. Reduce the time step size or increase the spatial step size.")
+
+    center_x, center_z = scatterer_pos
+    p = np.zeros((nt, nx, nz))
+
+    X, Z = np.meshgrid(np.arange(nx) * dx, np.arange(nz) * dz, indexing='ij')
+    sine_wave = np.cos(2 * np.pi * frequency * 0)
+    gaussian_envelope = np.exp(-((X - center_x * 10**-1)
+                               ** 2 + (Z - center_z * 10**-1)**2) / (2 * width**2))
+    p[0] = amplitude * sine_wave * gaussian_envelope
+    p[1] = p[0]
+
+    for n in tqdm(range(1, nt - 1), desc="Simulation Progress"):
+        partial_x = (p[n, 2:, 1:-1] - 2 * p[n, 1:-1, 1:-1] +
+                     p[n, :-2, 1:-1]) / dx**2
+        partial_z = (p[n, 1:-1, 2:] - 2 * p[n, 1:-1, 1:-1] +
+                     p[n, 1:-1, :-2]) / dz**2
+        right_side = c**2 * (partial_x + partial_z)
+        p[n + 1, 1:-1, 1:-1] = right_side * dt**2 + \
+            2 * p[n, 1:-1, 1:-1] - p[n - 1, 1:-1, 1:-1]
+
     return p

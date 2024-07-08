@@ -1,8 +1,8 @@
 name: Ultrasound_Physics_Simulator
 channels:
   - pytorch
-  - conda-forge
   - nvidia
+  - conda-forge
   - defaults
 dependencies:
   - _libgcc_mutex=0.1=main
@@ -10,8 +10,8 @@ dependencies:
   - blas=1.0=mkl
   - brotli-python=1.0.9=py311h6a678d5_8
   - bzip2=1.0.8=h5eee18b_6
-  - ca-certificates=2024.3.11=h06a4308_0
-  - certifi=2024.6.2=py311h06a4308_0
+  - ca-certificates=2024.7.4=hbcca054_0
+  - certifi=2024.6.2=pyhd8ed1ab_0
   - cuda-cudart=12.1.105=0
   - cuda-cupti=12.1.105=0
   - cuda-libraries=12.1.0=0
@@ -21,7 +21,7 @@ dependencies:
   - cuda-runtime=12.1.0=0
   - cudatoolkit=11.7.0=hd8887f6_10
   - cudnn=8.1.0.77=h90431f1_0
-  - ffmpeg=4.3=hf484d3e_0
+  - ffmpeg=4.3.2=hca11adc_0
   - filelock=3.13.1=py311h06a4308_0
   - freetype=2.12.1=h4a9f257_0
   - gmp=6.2.1=h295c915_3
@@ -93,6 +93,7 @@ dependencies:
   - typing_extensions=4.11.0=py311h06a4308_0
   - urllib3=2.2.2=py311h06a4308_0
   - wheel=0.43.0=py311h06a4308_0
+  - x264=1!161.3030=h7f98852_1
   - xz=5.4.6=h5eee18b_1
   - yaml=0.2.5=h7b6447c_0
   - zlib=1.2.13=h5eee18b_1
