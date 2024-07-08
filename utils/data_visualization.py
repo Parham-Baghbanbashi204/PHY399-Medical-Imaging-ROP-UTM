@@ -36,7 +36,7 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     fig.suptitle(title)
 
     # Define the colormap with a center value of white
-    cmap = plt.get_cmap('seismic')
+    cmap = plt.get_cmap('seismic_r')
 
     # Determine the max and min amplitude for the color scale
     vmin = np.min(wave_data)

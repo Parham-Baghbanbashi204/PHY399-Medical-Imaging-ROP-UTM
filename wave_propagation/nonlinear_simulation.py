@@ -15,6 +15,7 @@ from scipy.integrate import odeint
 from scipy.integrate import solve_ivp
 import pandas as pd
 from tqdm import tqdm
+import math
 
 
 def simulate_nonlinear_wave_propagation_leapfrog(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, num_cycles=3):
@@ -287,9 +288,11 @@ def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos,
     # Parameters for the initial wave function
     amplitude = 7e-8    # Amplitude of the wave
     frequency = wave.frequency     # Frequency of the wave
-    cycles = 4         # Number of cycles in the pulse ensure <= 1
-    # Width of the Gaussian envelope to cover the grid
-    width = 0.4
+    cycles = 4         # Number of cycles in the pulse
+    # Width of the Gaussian envelope to cover the grid - How we simulate sound attinuation
+    # For this sim its simply inverse square law
+    k = 1.0  # propotionality constant give the relation of decay weather its 1/r^2 or whatnot
+    width = k / medium.density  # should model inverse square law
     # # wave speed in relation to wave speed constant
     # # v = c * dx/dt
     c = v/(dx/dt)
