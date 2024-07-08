@@ -17,6 +17,7 @@ def main():
     """
     Main function to run the ultrasound simulation and visualization.
     """
+    print(f"NumPy version: {np.__version__}")
 
     # Define medium properties
     medium = Medium(density=1, sound_speed=1500)

@@ -354,6 +354,7 @@ def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos,
     return p
 
 
+#TODO ADD Source term
 @run_on_gpu
 def simulate_using_steps_optimized(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, pulse_width=0.5, cycles=1):
     """

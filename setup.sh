@@ -92,9 +92,9 @@ pip install -r requirements.txt
 echo "Verifying the environment..."
 conda list
 
-# Export the environment to environment.yml (optional)
-echo "Exporting the environment to environment.yml..."
-conda env export > environment.yml
+# # Export the environment to environment.yml (optional)
+# echo "Exporting the environment to environment.yml..."
+# conda env export > environment.yml
 
 # Deactivate the Conda environment
 echo "Deactivating the Conda environment..."

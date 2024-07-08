@@ -3,18 +3,19 @@ Data Visualization Module
 ==========================
 This module defines functions for visualizing wave and RF signal data.
 """
-import numpy as np
+# from vispy import app, gloo, scene
 import matplotlib.pyplot as plt
-from tqdm import tqdm
 from matplotlib.animation import FuncAnimation, FFMpegWriter
 import matplotlib.colors as mcolors
 from utils.run_on_gpu import run_on_gpu
+import numpy as np
+from tqdm import tqdm
 
 
 @run_on_gpu
 def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_pos, interval=20, title='Wave Animation'):
     """
-    Animates the wave data over time, highlighting the first peak and first trough as expanding rings.
+    Animates the wave data over time, representing the amplitude as a colorbar.
 
     :param wave_data: 3D numpy array where each slice is the wave amplitude at a given time.
     :type wave_data: numpy.ndarray
@@ -41,12 +42,11 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     cmap = plt.get_cmap('seismic_r')
 
     # Determine the max and min amplitude for the color scale
-    vmin = np.min(wave_data)
-    vmax = np.max(wave_data)
+    vmin, vmax = wave_data.min(), wave_data.max()
     norm = mcolors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
 
     # Create the initial plot with a color bar
-    cax = ax_wave.imshow(wave_data[0, :, :], cmap=cmap, norm=norm, extent=[
+    cax = ax_wave.imshow(wave_data[0], cmap=cmap, norm=norm, extent=[
                          x_points.min(), x_points.max(), z_points.min(), z_points.max()], origin='lower')
     colorbar = fig.colorbar(cax, ax=ax_wave, label='Amplitude')
 
@@ -77,12 +77,12 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
         :type frame: int
         """
         # Update the data for the current frame
-        cax.set_array(wave_data[frame, :, :])
+        cax.set_array(wave_data[frame])
         ax_wave.set_title(f'Time Step (nt) = {frame}')
         ax_wave.set_xlabel('x-dimension (mm)')
         ax_wave.set_ylabel('z-dimension (depth in mm)')
 
-        # Update the seismogram
+        # Update the seismogram - this is how we record the radiofrequency signal #TODO make this independant so we can add multiple recivers
         seismogram.set_data(
             times[:frame], wave_data[:frame, receiver_pos[0], receiver_pos[1]])
         ax_signal.set_xlim(0, times[frame])
