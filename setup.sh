@@ -5,7 +5,7 @@ PROJECT_NAME="phy_399"  # Replace with your project name
 PYTHON_VERSION="3.11"
 
 # CUDA and cuDNN versions
-CUDA_VERSION="11.2"
+CUDA_VERSION="12.1"
 CUDNN_VERSION="8.1.0"
 
 #NO LONGER NEEDED SINCE I REMOVED PIPENV AND NONE OF YOU HAVE IT 
@@ -38,6 +38,7 @@ CUDNN_VERSION="8.1.0"
 # rm -f Pipfile Pipfile.lock
 
 # INSTAL CUDA for wsl2 and nvida gpu's with pytorch support
+echo "Cuda for WSL"
 wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
 sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
 wget https://developer.download.nvidia.com/compute/cuda/12.1.0/local_installers/cuda-repo-wsl-ubuntu-12-1-local_12.1.0-1_amd64.deb
@@ -61,11 +62,11 @@ echo "initalizing miniconda"
 # Create a new Conda environment with CUDA support from environment.yml
 echo "Creating conda environment from environment.yml"
 conda env create -f environment.yml
+
 # echo "Creating a new Conda environment named $PROJECT_NAME with Python $PYTHON_VERSION and CUDA $CUDA_VERSION..."
 # conda create --name $PROJECT_NAME python=$PYTHON_VERSION -y
 echo "Activating ENV"
-conda activate Ultrasound_Physics_Simulator
-
+conda activate phy399
 
 # Add the necessary channels
 conda config --add channels conda-forge

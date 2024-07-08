@@ -354,7 +354,7 @@ def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos,
     return p
 
 
-# TODO ADD Source term
+# TODO MAKE SURE THE TIMESTEPS ADAPT TO THE LINE SPACE
 @run_on_gpu
 def simulate_using_steps_optimized_no_src(wave, medium, x_points, z_points, times, scatterer_pos, dx, dz, dt, initial_amplitude=0.1, pulse_width=0.5, cycles=1):
     """
@@ -451,18 +451,32 @@ def simulate_using_steps_optimized_no_src_auto(wave, medium, x_start, x_stop, x_
     :rtype: numpy.ndarray
     """
     v = medium.sound_speed
+    # ORIGNALS
+    dt = 0.001  # TODO figure out how to discretize without breaking everything this is just working so I might not touch it as long as the timesteps for x and z are consistant itll work
+    dx = 0.1
+    dz = 0.1
 
-    # Calculate dx, dz, and dt based on the provided start, stop, and steps
-    dx = (x_stop - x_start) / (x_steps - 1)
-    dz = (z_stop - z_start) / (z_steps - 1)
-    dt = (t_stop - t_start) / (t_steps - 1)
+    # Calculate dx, dz, and dt based on the provided start, stop, and step
+    x_points, dx = np.linspace(
+        x_start, x_stop, x_steps, retstep=True, endpoint=True)
+    z_points, dz = np.linspace(
+        z_start, z_stop, z_steps, retstep=True, endpoint=True)
+    nt, dt = np.linspace(t_start, t_stop, t_steps, retstep=True, endpoint=True)
+    nx = len(x_points)
+    nz = len(z_points)
+    nt = len(nt)
 
-    nx = x_steps
-    nz = z_steps
-    nt = t_steps
+    # assert nx == len(x_points), "the two dont match"
+    # dx = 0.1
+    # dz = 0.1
+    print("dx", dx)
+    print("dz", dz)
+    print("dt", dt)
+    print("nx", nx)
+    print("nt", nt)
     amplitude = wave.amplitude
     frequency = wave.frequency
-    width = 1.0 / medium.density
+    width = medium.density * medium.sound_speed  # acoustic impidance
     c = v / (dx / dt)
     cfl_number = c * dt / min(dx, dz)
 
@@ -473,12 +487,11 @@ def simulate_using_steps_optimized_no_src_auto(wave, medium, x_start, x_stop, x_
     center_x, center_z = scatterer_pos
     p = np.zeros((nt, nx, nz))
 
-    X, Z = np.meshgrid(np.linspace(x_start, x_stop, nx),
-                       np.linspace(z_start, z_stop, nz), indexing='ij')
+    X, Z = np.meshgrid(x_points, z_points, indexing='ij')
     sine_wave = np.cos(2 * np.pi * frequency * 0)
     gaussian_envelope = np.exp(-((X - center_x) **
-                               2 + (Z - center_z)**2) / (2 * width**2))
-    p[0] = amplitude * sine_wave * gaussian_envelope
+                                 2 + (Z - center_z)**2) / (2 * width**2))
+    p[0] = amplitude * sine_wave * gaussian_envelope  # without sin wave
     p[1] = p[0]
 
     for n in tqdm(range(1, nt - 1), desc="Simulation Progress"):
@@ -493,7 +506,7 @@ def simulate_using_steps_optimized_no_src_auto(wave, medium, x_start, x_stop, x_
     return p
 
 
-@run_on_gpu
+@ run_on_gpu
 def simulate_using_steps_optimized_with_cont_src(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, pulse_width=0.5, cycles=1):
     """
     Simulate pressure wave propagation using partial derivatives, optimized version of the original function using vectorization, with a point source term.
@@ -552,7 +565,7 @@ def simulate_using_steps_optimized_with_cont_src(wave, medium, x_points, z_point
     return p
 
 
-@run_on_gpu
+@ run_on_gpu
 def simulate_using_steps_optimized_with_pulse_source(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, pulse_width=0.5, cycles=1):
     """
     Simulate pressure wave propagation using partial derivatives, optimized version of the original function using vectorization, with a pulse source term.
@@ -600,7 +613,7 @@ def simulate_using_steps_optimized_with_pulse_source(wave, medium, x_points, z_p
     X, Z = np.meshgrid(np.arange(nx) * dx, np.arange(nz) * dz, indexing='ij')
     sine_wave = np.cos(2 * np.pi * frequency * 0)
     gaussian_envelope = np.exp(-((X - center_x * dx) **
-                               2 + (Z - center_z * dz)**2) / (2 * pulse_width**2))
+                                 2 + (Z - center_z * dz)**2) / (2 * pulse_width**2))
     p[0] = amplitude * sine_wave * gaussian_envelope
     p[1] = p[0]
 

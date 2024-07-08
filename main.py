@@ -19,23 +19,25 @@ def main():
     """
 
     # Define medium properties
-    medium = Medium(density=1, sound_speed=1500)
+    medium = Medium(density=1.081e-3, sound_speed=1700)
 
     # Define simulation parameters
-    start_time = 0
-    end_time = 0.3  # in sec
-    total_time_steps = 600
+    t_start = 0
+    end_time = 5  # in sec
+    total_time_steps = 1000
 
     # TODO pass the step as the dx,dz and dt for the sim
     x_points, dx = np.linspace(
-        0, 200, 200, retstep=True, endpoint=True)  # in mm
+        0, 100, 100, retstep=True, endpoint=True)  # in mm
     z_points, dz = np.linspace(
-        0, 200, 200, retstep=True, endpoint=True)  # in mm
+        0, 100, 100, retstep=True, endpoint=True)  # in mm
     times, dt = np.linspace(
         0, end_time, total_time_steps, retstep=True, endpoint=True)
 
+    print("orignal dt", dt)
+
     scatterer_pos = (60, 60)  # in mm
-    receiver_pos = (80, 80)   # in mm
+    receiver_pos = (65, 65)   # in mm
 
     initial_amplitude = 7e-6  # Adjust this value to change wave strength
     frequency = 5e5  # 5 MHz
@@ -43,38 +45,22 @@ def main():
     wave = NonlinearUltrasoundWave(
         frequency=frequency, amplitude=initial_amplitude, speed=medium.sound_speed, nonlinearity=0.01)
 
-    # OPTIMIZATION TESTING
-    # start_time = time.time()
-    # result_original = simulate_using_steps(
-    #     wave, medium, x_points, z_points, times, scatterer_pos)
-    # end_time = time.time()
-    # print(
-    #     f"Original function execution time: {end_time - start_time:.2f} seconds")
-
-    start_time = time.time()
+    start_timer = time.time()
     # NO PULSE SOURCE FOR THIS PHASE SINCE WE ARE ONLY SIMULATING THE ECHO thus no src term since the echo is just an intal pulse back aka just the inital conditions.
-    result_optimized = simulate_using_steps_optimized_no_src(
-        wave, medium, x_points, z_points, times, scatterer_pos, dx, dz, dt)
+    result_optimized = simulate_using_steps_optimized_no_src_auto(
+        wave, medium, 0, 100, 100, 0, 100, 100, t_start, end_time, total_time_steps, scatterer_pos)
     # result_optimized = simulate_using_steps_optimized_no_src_auto(
     # wave, medium, 0, 200, 200, 0, 200, 200, 0, 0.3, 500, scatterer_pos)
     end_time = time.time()
     print(
-        f"Optimized function execution time: {end_time - start_time:.2f} seconds")
-
-    # try:
-    #     np.testing.assert_allclose(
-    #         result_original, result_optimized, rtol=1e-5)
-    #     print("The original and optimized functions return the same output.")
-    # except AssertionError as e:
-    #     print("The outputs of the original and optimized functions do not match.")
-    #     print(e)
-
+        f"Optimized function execution time: {end_time - start_timer:.2f} seconds")
     wavefield = result_optimized
     print("Wavefield Summary:")
     print("Min value:", np.min(wavefield))
     print("Max value:", np.max(wavefield))
     print("Mean value:", np.mean(wavefield))
 
+    # TODO MAKE THIS WORK WITH THE AUTO FUNCTION
     print("Rendering Animation")
     animate_wave(wavefield, x_points, z_points,
                  times, scatterer_pos, receiver_pos)

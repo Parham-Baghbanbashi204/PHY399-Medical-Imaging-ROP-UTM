@@ -70,6 +70,10 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     # Initialize the progress bar
     progress_bar = tqdm(total=len(times), desc="Rendering Animation")
 
+    # set sizmogram max and min
+    siz_max = np.max(wave_data[:, receiver_pos[0], receiver_pos[1]])
+    siz_min = np.min(wave_data[:, receiver_pos[0], receiver_pos[1]])
+
     def update(frame):
         """
         Update function for each frame of the animation.
@@ -87,7 +91,7 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
         seismogram.set_data(
             times[:frame], wave_data[:frame, receiver_pos[0], receiver_pos[1]])
         ax_signal.set_xlim(0, times[frame])
-        ax_signal.set_ylim(vmin, vmax)
+        ax_signal.set_ylim(siz_min, siz_max)
 
         # Update the progress bar
         progress_bar.update(1)
