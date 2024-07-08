@@ -18,21 +18,26 @@ def main():
     medium = Medium(density=1, sound_speed=1500)
 
     # Define simulation parameters
-    x_points = np.linspace(0, 100, 100)  # 500 points along x-dimension in mm
+    start_time = 0
+    end_time = 1  # in sec
+    total_time_steps = 400
+    # TODO Make this part happen in theh simulator itself this way everything scales well
+    x_points = np.linspace(0, 500, 500)  # in mm
     # 500 points along z-dimension (depth) in mm
-    z_points = np.linspace(0, 100, 100)
-    times = np.linspace(0, 1e-6, 300)    # 500 time steps up to 1 microsecond
+    z_points = np.linspace(0, 500, 500)
+    # 0.1 seconds per time step
+    times = np.linspace(0, end_time, total_time_steps)
 
     # Define scatterer and receiver positions
     # RN the way this is is (x,z)
-    scatterer_pos = (40, 40)  # in mm
-    receiver_pos = (75, 55)   # in mm
+    scatterer_pos = (30, 30)  # in mm
+    receiver_pos = (370, 370)   # in mm
 
     # Initial amplitude (representing voltage)
-    initial_amplitude = 3  # Adjust this value to change wave strength
+    initial_amplitude = 10  # Adjust this value to change wave strength
 
     # Frequency of the ultrasound wave
-    frequency = 5e6  # 5 MHz
+    frequency = 5e5  # 5 MHz
 
     # Generate nonlinear ultrasound wave propagation data
     wave = NonlinearUltrasoundWave(
@@ -51,7 +56,6 @@ def main():
     print("Min value:", np.min(wavefield))
     print("Max value:", np.max(wavefield))
     print("Mean value:", np.mean(wavefield))
-    print("RAW Values:", wavefield)
 
     # Animate the wave propagation
     print("Rendering Animation")

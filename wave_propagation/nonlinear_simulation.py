@@ -14,33 +14,7 @@ import scipy as sp
 from scipy.integrate import odeint
 from scipy.integrate import solve_ivp
 import pandas as pd
-
-
-def simulate_nonlinear_wave_propagation(wave, medium, x_points, z_points, times, scatterer_pos, inital_amplitude=0.1, num_cycles=3):
-    """ 
-    Use Scipy to solve the pressure wave using coupled ODE's 
-
-     :param wave: An instance of NonlinearUltrasoundWave.
-     :type wave: NonlinearUltrasoundWave
-     :param medium: An instance of Medium.
-     :type medium: Medium
-     :param x_points: 1D array of spatial points along x-dimension.
-     :type x_points: numpy.ndarray
-     :param z_points: 1D array of spatial points along z-dimension.
-     :type z_points: numpy.ndarray
-     :param times: 1D array of time points.
-     :type times: numpy.ndarray
-     :param scatterer_pos: Tuple of the scatterer's position (x, z).
-     :type scatterer_pos: tuple
-     :param initial_amplitude: Initial amplitude of the wave (representing voltage).
-     :type initial_amplitude: float
-     :param num_cycles: Number of cycles in the ultrasound pulse.
-     :type num_cycles: int
-     :return: A 3D array of wave amplitudes over time and space.
-     :rtype: numpy.ndarray
-    """
-
-    pass
+from tqdm import tqdm
 
 
 def simulate_nonlinear_wave_propagation_leapfrog(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, num_cycles=3):
@@ -118,9 +92,9 @@ def simulate_nonlinear_wave_propagation_leapfrog(wave, medium, x_points, z_point
     return results
 
 
-def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1):
+def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos, initial_amplitude=0.1, pulse_width=0.5, cycles=1):
     """
-    Simulate nonlinear wave propagation in a medium using the leapfrog method.
+    Simulate preasure wave propgation using partial dirivitives.
 
     :param wave: An instance of NonlinearUltrasoundWave.
     :type wave: NonlinearUltrasoundWave
@@ -300,21 +274,40 @@ def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos,
     #     return np.exp(-((x-cx)**2 + (z-cz)**2)) * np.cos(2 * np.pi * 5e6 * 0 * 1)
 
     # Define parameters
-    c = 1.0      # Wave speed constant
-    dt = 0.01    # Time step size
-    dx = 0.1     # x position step size
+    v = medium.sound_speed
+    # time step size using np.linespace timestep generator
+    dt = 0.001
+    print(dt)
+    dx = 0.1     # x position step size the simulation gets unstable if this isnt ajusted right
     dz = 0.1     # z position step size
+    # Calculate dx and dz based on the linspace intervals
     nx = len(x_points)     # Number of x points
     nz = len(z_points)     # Number of z points
     nt = len(times)     # Number of time steps
     # Parameters for the initial wave function
-    amplitude = wave.amplitude     # Amplitude of the wave
+    amplitude = 7e-8    # Amplitude of the wave
     frequency = wave.frequency     # Frequency of the wave
     cycles = 4         # Number of cycles in the pulse ensure <= 1
     # Width of the Gaussian envelope to cover the grid
-    width = 0.5
+    width = 0.4
+    # # wave speed in relation to wave speed constant
+    # # v = c * dx/dt
+    c = v/(dx/dt)
+
+    # TODO Experiment with this later
+    # # Calculate dt based on the CFL condition
+    # dt = 0.5 * min(dx, dz) / c  # Safety factor of 0.5 to ensure stability
+    # print("new dt", dt)
+
+    # Verify the CFL condition
+    cfl_number = c * dt / min(dx, dz)
+    print(f"CFL number: {cfl_number}")
+
+    if cfl_number > 1:
+        raise ValueError(
+            "CFL condition not satisfied. Reduce the time step size or increase the spatial step size.")
+
     # Center position of the Gaussian envelope in x
-    
     center_x = scatterer_pos[0]
     # Center position of the Gaussian envelope in z
     center_z = scatterer_pos[1]
@@ -328,11 +321,11 @@ def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos,
                 i * dx, j*dz, 0, amplitude, frequency, cycles, width, center_x*10**-1, center_z*10**-1)
             p[1, i, j] = p[0, i, j]  # Initial condition for the second time step
 
-    print("INITAL CONDITIONS:", p[0, :, :])
+    # print("INITAL CONDITIONS:", p[0, :, :])
 
     # Run the simulation
-    for n in range(1, nt-1):
-        print("running time step", n)
+    for n in tqdm(range(1, nt-1), desc="Simulation Progress"):
+        # print("running time step", n)
         for i in range(1, nx-1):
             for j in range(1, nz-1):
                 # Compute partial derivatives
@@ -352,6 +345,5 @@ def simulate_using_steps(wave, medium, x_points, z_points, times, scatterer_pos,
                     2 * p[n, i, j] - p[n-1, i, j]
 
     # p now contains the pressure wave values for all time steps and spatial points
-
+    print("finished processing")
     return p
-

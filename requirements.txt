@@ -1,0 +1,47 @@
+-e .
+alabaster==0.7.16
+babel==2.15.0
+certifi==2024.6.2
+charset-normalizer==3.3.2
+contourpy==1.2.1
+cycler==0.12.1
+docutils==0.21.2
+exceptiongroup==1.2.1; python_version < '3.11'
+fonttools==4.53.0
+idna==3.7
+imagesize==1.4.1
+importlib-metadata==8.0.0; python_version < '3.10'
+importlib-resources==6.4.0; python_version < '3.10'
+iniconfig==2.0.0
+jinja2==3.1.4
+kiwisolver==1.4.5
+llvmlite==0.43.0
+markupsafe==2.1.5
+matplotlib==3.9.0
+numba==0.60.0
+numpy==2.0.0
+packaging==24.1
+pandas==2.2.2
+pillow==10.3.0
+pluggy==1.5.0
+pygments==2.18.0
+pyparsing==3.1.2
+pytest==8.2.2
+python-dateutil==2.9.0.post0
+pytz==2024.1; python_version < '3.9'
+requests==2.32.3
+scipy==1.14.0
+six==1.16.0
+snowballstemmer==2.2.0
+sphinx-autodoc-typehints==2.2.2
+sphinx==7.3.7
+sphinxcontrib-applehelp==1.0.8
+sphinxcontrib-devhelp==1.0.6
+sphinxcontrib-htmlhelp==2.0.5
+sphinxcontrib-jsmath==1.0.1
+sphinxcontrib-qthelp==1.0.7
+sphinxcontrib-serializinghtml==1.1.10
+tomli==2.0.1; python_version < '3.11'
+tzdata==2024.1
+urllib3==2.2.2
+zipp==3.19.2; python_version < '3.10'

@@ -7,4 +7,4 @@ Simple Wave propgation module for simple simulations of a pressure wave
 
 from .propagation import UltrasoundWave, Medium
 from .nonlinear_wave import NonlinearUltrasoundWave
-from .nonlinear_simulation import simulate_nonlinear_wave_propagation
+from .nonlinear_simulation import simulate_using_steps

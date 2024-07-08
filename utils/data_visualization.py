@@ -3,9 +3,9 @@ Data Visualization Module
 ==========================
 This module defines functions for visualizing wave and RF signal data.
 """
-
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 from matplotlib.animation import FuncAnimation, FFMpegWriter
 import matplotlib.colors as mcolors
 
@@ -36,9 +36,12 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     fig.suptitle(title)
 
     # Define the colormap with a center value of white
-    cmap = plt.get_cmap('seismic')  # type:ignore
-    norm = mcolors.TwoSlopeNorm(
-        vmin=-wave_data.max(), vcenter=0, vmax=wave_data.max())
+    cmap = plt.get_cmap('seismic')
+
+    # Determine the max and min amplitude for the color scale
+    vmin = np.min(wave_data)
+    vmax = np.max(wave_data)
+    norm = mcolors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
 
     # Create the initial plot with a color bar
     cax = ax_wave.imshow(wave_data[0, :, :], cmap=cmap, norm=norm, extent=[
@@ -61,6 +64,9 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     # Initialize the seismogram line
     seismogram, = ax_signal.plot([], [], 'b-', label='Finite Difference')
 
+    # Initialize the progress bar
+    progress_bar = tqdm(total=len(times), desc="Rendering Animation")
+
     def update(frame):
         """
         Update function for each frame of the animation.
@@ -78,9 +84,11 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
         seismogram.set_data(
             times[:frame], wave_data[:frame, receiver_pos[0], receiver_pos[1]])
         ax_signal.set_xlim(0, times[frame])
-        ax_signal.set_ylim(-wave_data.max(), wave_data.max())
-        print("redered timestep", frame)
-        return cax
+        ax_signal.set_ylim(vmin, vmax)
+
+        # Update the progress bar
+        progress_bar.update(1)
+        return cax, seismogram
 
     # Create the animation object
     ani = FuncAnimation(fig, update, frames=len(
@@ -90,43 +98,5 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     writer = FFMpegWriter(fps=30, metadata=dict(artist='Me'), bitrate=1800)
     ani.save("animations/wave_animation.mp4", writer=writer)
 
-
-# def animate_rf_signal(rf_data, time, interval=20, title='RF Signal Animation'):
-#     """
-#     Animates the RF signal data over time.
-
-#     :param rf_data: 2D numpy array where each row is the RF signal at a given time.
-#     :type rf_data: numpy.ndarray
-#     :param time: 1D numpy array representing the time domain.
-#     :type time: numpy.ndarray
-#     :param interval: Time between frames in milliseconds.
-#     :type interval: int
-#     :param title: Title of the animation.
-#     :type title: str
-#     """
-#     # Create the figure and axis objects
-#     fig, ax = plt.subplots()
-
-#     # Initialize the line object
-#     line, = ax.plot(time, rf_data[0, :])
-
-#     def update(frame):
-#         """
-#         Update function for each frame of the animation.
-
-#         :param frame: Current frame number.
-#         :type frame: int
-#         """
-#         # Update the y-data of the line object for the current frame
-#         line.set_ydata(rf_data[frame, :])
-#         ax.set_title(f'Time Step (nt) = {frame}')
-#         ax.set_xlabel('Time (s)')
-#         ax.set_ylabel('Amplitude')
-
-#     # Create the animation object
-#     ani = FuncAnimation(
-#         fig, update, frames=rf_data.shape[0], interval=interval, repeat=False)
-
-#     # Save the animation to a video file
-#     writer = FFMpegWriter(fps=30, metadata=dict(artist='Me'), bitrate=1800)
-#     ani.save("animations/rf_signal_animation.mp4", writer=writer)
+    # Close the progress bar
+    progress_bar.close()
