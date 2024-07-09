@@ -90,7 +90,7 @@ def simulate_using_steps_optimized(
     """
     # Define Parameters
     v = wave.speed  # m/s
-    # Calculate dx, dz, and dt based on the provided start, stop, and step
+    # Intal Temporal Spatial Feild - Calculate dx, dz, and dt based on the provided start, stop, and step
     x_points, dx = np.linspace(
         x_start,
         x_stop,
@@ -123,7 +123,7 @@ def simulate_using_steps_optimized(
         medium.density * wave.speed
     )  # acoustic impidance in kg/m^3
 
-    # Set wave speed constant
+    # Set wave speed constant c = v/(dx/dt) - Ajusts v for spatial and time step
     c = v / (dx / dt)
 
     # Ensure CFL conditions met

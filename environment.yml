@@ -133,21 +133,30 @@ dependencies:
   - zstd=1.5.5=hc292b87_2
   - pip:
       - alabaster==0.7.16
+      - astroid==3.2.2
       - babel==2.15.0
+      - black==24.4.2
+      - click==8.1.7
       - contourpy==1.2.1
       - cycler==0.12.1
+      - dill==0.3.8
       - docutils==0.21.2
       - fonttools==4.53.0
       - imagesize==1.4.1
       - iniconfig==2.0.0
+      - isort==5.13.2
       - kiwisolver==1.4.5
       - llvmlite==0.43.0
       - markupsafe==2.1.5
       - matplotlib==3.9.0
+      - mccabe==0.7.0
+      - mypy-extensions==1.0.0
       - numpy==1.24.0
       - pandas==2.2.2
+      - pathspec==0.12.1
       - pillow==10.4.0
       - pluggy==1.5.0
+      - pylint==3.2.5
       - pyparsing==3.1.2
       - pytest==8.2.2
       - python-dateutil==2.9.0.post0
@@ -164,6 +173,7 @@ dependencies:
       - sphinxcontrib-qthelp==1.0.7
       - sphinxcontrib-serializinghtml==1.1.10
       - tdqm==0.0.1
+      - tomlkit==0.12.5
       - tqdm==4.66.4
       - tzdata==2024.1
 prefix: /home/parhambagh/miniconda3/envs/phy399
