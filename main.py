@@ -11,36 +11,38 @@ from wave_propagation.nonlinear_simulation import simulate_reciver, simulate_usi
 from utils.run_on_gpu import run_on_gpu
 
 
-@run_on_gpu
 def main():
     """
     Main function to run the ultrasound simulation and visualization.
     """
 
     # Define simulation parameters
+    """ 
+    The resolution of the grid will be stop/steps in metres ie, x_stop = 1000 x_step = 100 => 10m resolution
+        - best resolution seeems to be 0.5 for the x and z steps, having an index every 0.5m
+    """
     t_start = 0
-    t_stop = 3  # in sec - the longer the time the better the resolution
-    # Controls simulation time, basicly how many timesteps we want to see bigger this is the better the simulation(better aproximation)
+    # controls total simulation time - ie are we simulating 3 sec or whatnot
+    t_stop = 5  # in sec - the longer the time the better the resolution
     # temporal resolution (dt = 0.005) - smaller this number better the aproximation - can never model real time due to calculs constraint(were using descrete math)
     t_steps = 2*t_stop*100  # Best temporal resolution with computing constraints also allows for constant temporal resolution with changes in time interval
     x_start = 0
-    """ 
-    The resolution of the grid will be stop/steps in metres ie, x_stop = 1000 x_step = 100 => 10m resolution
-    """
+
     # in m - standard unit of measure for the scaliablity
     x_stop = 100
-    # determines resolution - currently set to 0.5m resolution(dx=0.5m)
-    x_steps = 200
+    # determines resolution - currently set to 0.5m, basicly setting the tickmarks every 50cm resolution(dx=0.5m)
+    x_steps = 2*x_stop
     z_start = 0
     z_stop = 100  # in m - since the standard unit of measure is m currently
     # determines z resolution - currently 0.5m resolution (dz = 0.5m)
-    z_steps = 200
+    z_steps = 2*z_stop
     "formated in (z,x)"
-    scatterer_pos = (50, 50)  # in m
+    scatterer_pos = (20, 20)  # in m
     receiver_pos = (70, 70)   # in m
     initial_amplitude = 7e-6  # Adjust this value to change wave strength
     frequency = 5e5  # 5 MHz
-    # Define medium properties
+    # Define medium properties - note that souond speed will be wave speed in this instance
+    # TODO move this to the wave class insted
     medium = Medium(density=1.081e-3, sound_speed=1530)
 
     # Build the wave
