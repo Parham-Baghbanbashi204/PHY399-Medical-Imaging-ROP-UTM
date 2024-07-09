@@ -28,6 +28,7 @@ def simulate_reciver(wave_data, x_points, z_points, times, listen_pos):
     """
     x_idx = np.argmin(np.abs(x_points - listen_pos[0]))
     z_idx = np.argmin(np.abs(z_points - listen_pos[1]))
+    print("Listining to Wave")
 
     return wave_data[:, x_idx, z_idx], times
 
@@ -63,6 +64,7 @@ def simulate_using_steps_optimized(wave, medium, x_start, x_stop, x_steps, z_sta
     :return: A 3D array of wave amplitudes over time and space, all the x points, all the z_points and all the times
     :rtype: numpy.ndarray
     """
+    # Define Parameters
     v = medium.sound_speed  # m/s
     # Calculate dx, dz, and dt based on the provided start, stop, and step
     x_points, dx = np.linspace(
@@ -71,13 +73,19 @@ def simulate_using_steps_optimized(wave, medium, x_start, x_stop, x_steps, z_sta
         z_start, z_stop, z_steps, retstep=True, endpoint=True)
     times, dt = np.linspace(t_start, t_stop, t_steps,
                             retstep=True, endpoint=True)
+    # Set number of steps
     nx = len(x_points)
     nz = len(z_points)
     nt = len(times)
+    # Set amplitude frequency and acoustic impidance(width)
     amplitude = wave.amplitude
     frequency = wave.frequency
     width = medium.density * medium.sound_speed  # acoustic impidance in kg/m^3
+
+    # Set wave speed constant
     c = v / (dx / dt)
+
+    # Ensure CFL conditions met
     cfl_number = c * dt / min(dx, dz)
 
     if cfl_number > 1:
@@ -85,15 +93,19 @@ def simulate_using_steps_optimized(wave, medium, x_start, x_stop, x_steps, z_sta
         raise ValueError(
             "CFL condition not satisfied. Reduce the time step size or increase the spatial step size.")
 
+    # Set the centre to be the scatterer
     center_x, center_z = scatterer_pos
+    print("Setting Inital Conditions")
     p = np.zeros((nt, nx, nz))
 
+    # Using Paramiters create Inital Conditions
     X, Z = np.meshgrid(x_points, z_points, indexing='ij')
     sine_wave = np.cos(2 * np.pi * frequency * 0)
     gaussian_envelope = np.exp(-((X - center_x) **
                                  2 + (Z - center_z)**2) / (2 * width**2))
     p[0] = amplitude * sine_wave * gaussian_envelope  # without sin wave
     p[1] = p[0]
+    print("Running Simulation")
 
     # loop over the times
     for n in tqdm(range(1, nt - 1), desc="Simulation Progress"):
@@ -104,7 +116,7 @@ def simulate_using_steps_optimized(wave, medium, x_start, x_stop, x_steps, z_sta
         right_side = c**2 * (partial_x + partial_z)
         p[n + 1, 1:-1, 1:-1] = right_side * dt**2 + \
             2 * p[n, 1:-1, 1:-1] - p[n - 1, 1:-1, 1:-1]
-
+    print("Simulation Complete")
     return p, x_points, z_points, times
 
 
@@ -346,7 +358,7 @@ def simulate_using_steps(wave, medium, x_start, x_stop, x_steps, z_start, z_stop
                     2 * p[n, i, j] - p[n-1, i, j]
 
     # p now contains the pressure wave values for all time steps and spatial points
-    print("finished processing")
+    print("Simulation Complete")
     return p, x_points, z_points, times
 
 

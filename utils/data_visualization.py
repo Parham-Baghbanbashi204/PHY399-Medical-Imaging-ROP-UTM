@@ -12,10 +12,10 @@ import numpy as np
 from tqdm import tqdm
 
 
-@run_on_gpu  # runs calculations on the gpu
+# @run_on_gpu  # runs calculations on the gpu - no calcuations being made here
 def animate_wave(wave_data, rfsignal, x_points, z_points, times, scatterer_pos, receiver_pos, interval=20, title='Wave Animation', file="wave_animation"):
     """
-    Animates the wave data over time, representing the amplitude as a colorbar.
+    Animates the wave data over time, representing the amplitude as a colorbar and the radio frequency signal as a sizemograph.
 
     :param wave_data: 3D numpy array where each slice is the wave amplitude at a given time.
     :type wave_data: numpy.ndarray
@@ -52,7 +52,7 @@ def animate_wave(wave_data, rfsignal, x_points, z_points, times, scatterer_pos, 
                          x_points.min(), x_points.max(), z_points.min(), z_points.max()], origin='lower')
     colorbar = fig.colorbar(cax, ax=ax_wave, label='Amplitude')
 
-    # Add scatterer and receiver markers
+    # Add scatterer and receiver markers in (z,x) - conveerts (x,z) to (z,x)
     ax_wave.plot(scatterer_pos[1], scatterer_pos[0], 'ro', label='Scatterer')
     ax_wave.plot(receiver_pos[1], receiver_pos[0], 'ks', label='Receiver')
 

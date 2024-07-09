@@ -1,7 +1,7 @@
 """
 Wave Proagation
 ===============
-Simple Wave propgation module for simple simulations of a pressure wave
+Simple Wave propgation module for simulations of a pressure wave
 """
 # This makes the modules available at the package level
 
