@@ -32,7 +32,9 @@ class UltrasoundWave:
     :type speed: float
     """
 
-    def __init__(self, frequency, amplitude, speed):
+    def __init__(
+        self, frequency, amplitude, speed
+    ):
         self.frequency = frequency
         self.amplitude = amplitude
         self.speed = speed
@@ -48,4 +50,6 @@ class UltrasoundWave:
         :return: The wave amplitude at the given distance and time.
         :rtype: float
         """
-        raise NotImplementedError("Subclasses should implement this!")
+        raise NotImplementedError(
+            "Subclasses should implement this!"
+        )

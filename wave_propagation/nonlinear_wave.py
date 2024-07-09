@@ -22,26 +22,59 @@ class NonlinearUltrasoundWave(UltrasoundWave):
     :type nonlinearity: float
     """
 
-    def __init__(self, frequency, amplitude, speed, nonlinearity):
+    def __init__(
+        self,
+        frequency,
+        amplitude,
+        speed,
+        nonlinearity,
+    ):
         # Validate parameters
-        if not isinstance(frequency, (int, float)) or frequency <= 0:
-            raise ValueError("Frequency must be a positive number.")
-        if not isinstance(amplitude, (int, float)) or amplitude <= 0:
-            raise ValueError("Amplitude must be a positive number.")
-        if not isinstance(speed, (int, float)) or speed <= 0:
-            raise ValueError("Speed must be a positive number.")
-        if not isinstance(nonlinearity, (int, float)) or nonlinearity < 0:
-            raise ValueError("Nonlinearity must be a non-negative number.")
+        if (
+            not isinstance(
+                frequency, (int, float)
+            )
+            or frequency <= 0
+        ):
+            raise ValueError(
+                "Frequency must be a positive number."
+            )
+        if (
+            not isinstance(
+                amplitude, (int, float)
+            )
+            or amplitude <= 0
+        ):
+            raise ValueError(
+                "Amplitude must be a positive number."
+            )
+        if (
+            not isinstance(speed, (int, float))
+            or speed <= 0
+        ):
+            raise ValueError(
+                "Speed must be a positive number."
+            )
+        if (
+            not isinstance(
+                nonlinearity, (int, float)
+            )
+            or nonlinearity < 0
+        ):
+            raise ValueError(
+                "Nonlinearity must be a non-negative number."
+            )
 
         # Initialize superclass with frequency, amplitude, and speed
-        super().__init__(frequency, amplitude, speed)
+        super().__init__(
+            frequency, amplitude, speed
+        )
         # Initialize the nonlinearity parameter
         self.nonlinearity = nonlinearity
 
-    # TODO REMOVE or have this work with density
     def propagate(self, distance, time):
         """
-        Simulate the propagation of the nonlinear wave.
+        Simulate the propagation of the nonlinear wave over a fixed distance and time.
 
         :param distance: The distance over which the wave propagates.
         :type distance: float
@@ -51,17 +84,35 @@ class NonlinearUltrasoundWave(UltrasoundWave):
         :rtype: float
         """
         # Validate parameters
-        if not isinstance(distance, (int, float)) or distance < 0:
-            raise ValueError("Distance must be a non-negative number.")
-        if not isinstance(time, (int, float)) or time < 0:
-            raise ValueError("Time must be a non-negative number.")
+        if (
+            not isinstance(distance, (int, float))
+            or distance < 0
+        ):
+            raise ValueError(
+                "Distance must be a non-negative number."
+            )
+        if (
+            not isinstance(time, (int, float))
+            or time < 0
+        ):
+            raise ValueError(
+                "Time must be a non-negative number."
+            )
 
         # Calculate the wavelength
         wavelength = self.speed / self.frequency
         # Calculate the Gaussian envelope
-        envelope = np.exp(-((distance - self.speed * time)
-                          ** 2) / (2 * (wavelength ** 2)))
+        envelope = np.exp(
+            -((distance - self.speed * time) ** 2)
+            / (2 * (wavelength**2))
+        )
         # Apply the nonlinearity effect
-        nonlinear_effect = np.exp(-self.nonlinearity * distance)
+        nonlinear_effect = np.exp(
+            -self.nonlinearity * distance
+        )
         # Return the resulting amplitude
-        return self.amplitude * envelope * nonlinear_effect
+        return (
+            self.amplitude
+            * envelope
+            * nonlinear_effect
+        )

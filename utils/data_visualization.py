@@ -3,17 +3,31 @@ Data Visualization Module
 ==========================
 This module defines functions for visualizing wave and RF signal data.
 """
-# from vispy import app, gloo, scene
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation, FFMpegWriter
-import matplotlib.colors as mcolors
-from utils.run_on_gpu import run_on_gpu
+
 import numpy as np
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+from matplotlib.animation import (
+    FuncAnimation,
+    FFMpegWriter,
+)
+import matplotlib.colors as mcolors
+from utils.run_on_gpu import run_on_gpu
 
 
-# @run_on_gpu  # runs calculations on the gpu - no calcuations being made here
-def animate_wave(wave_data, rfsignal, x_points, z_points, times, scatterer_pos, receiver_pos, interval=20, title='Wave Animation', file="wave_animation"):
+@run_on_gpu  # runs calculations on the gpu - no calcuations being made here
+def animate_wave(
+    wave_data,
+    rfsignal,
+    x_points,
+    z_points,
+    times,
+    scatterer_pos,
+    receiver_pos,
+    interval=20,
+    title='Wave Animation',
+    file="wave_animation",
+):
     """
     Animates the wave data over time, representing the amplitude as a colorbar and the radio frequency signal as a sizemograph.
 
@@ -36,7 +50,9 @@ def animate_wave(wave_data, rfsignal, x_points, z_points, times, scatterer_pos, 
     :type title: str
     """
     # Create the figure and axis objects
-    fig, (ax_wave, ax_signal) = plt.subplots(1, 2, figsize=(12, 6))
+    fig, (ax_wave, ax_signal) = plt.subplots(
+        1, 2, figsize=(12, 6)
+    )
     fig.suptitle(title)
 
     # Define the colormap with a center value of white
@@ -45,16 +61,42 @@ def animate_wave(wave_data, rfsignal, x_points, z_points, times, scatterer_pos, 
     # Determine the max amplitude for the color scale
     max_val = np.max(np.abs(wave_data))
     vmin, vmax = -max_val, max_val
-    norm = mcolors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
+    norm = mcolors.TwoSlopeNorm(
+        vmin=vmin, vcenter=0, vmax=vmax
+    )
 
     # Create the initial plot with a color bar
-    cax = ax_wave.imshow(wave_data[0], cmap=cmap, norm=norm, extent=[
-                         x_points.min(), x_points.max(), z_points.min(), z_points.max()], origin='lower')
-    colorbar = fig.colorbar(cax, ax=ax_wave, label='Amplitude')
+    cax = ax_wave.imshow(
+        wave_data[0],
+        cmap=cmap,
+        norm=norm,
+        extent=[
+            x_points.min(),
+            x_points.max(),
+            z_points.min(),
+            z_points.max(),
+        ],
+        origin='lower',
+    )
+    # pylint: disable=unused-variable
+    colorbar = fig.colorbar(
+        cax, ax=ax_wave, label='Amplitude'
+    )
+    # pylint: enable=unused-variable
 
     # Add scatterer and receiver markers in (z,x) - conveerts (x,z) to (z,x)
-    ax_wave.plot(scatterer_pos[1], scatterer_pos[0], 'ro', label='Scatterer')
-    ax_wave.plot(receiver_pos[1], receiver_pos[0], 'ks', label='Receiver')
+    ax_wave.plot(
+        scatterer_pos[1],
+        scatterer_pos[0],
+        'ro',
+        label='Scatterer',
+    )
+    ax_wave.plot(
+        receiver_pos[1],
+        receiver_pos[0],
+        'ks',
+        label='Receiver',
+    )
 
     # Add legend
     ax_wave.legend()
@@ -66,10 +108,15 @@ def animate_wave(wave_data, rfsignal, x_points, z_points, times, scatterer_pos, 
     ax_signal.grid(True)
 
     # Initialize the seismogram line
-    seismogram, = ax_signal.plot([], [], 'b-', label='Finite Difference')
+    (seismogram,) = ax_signal.plot(
+        [], [], 'b-', label='Finite Difference'
+    )
 
     # Initialize the progress bar
-    progress_bar = tqdm(total=len(times), desc="Rendering Animation")
+    progress_bar = tqdm(
+        total=len(times),
+        desc="Rendering Animation",
+    )
 
     # set sizmogram max and min
     siz_max = np.max(rfsignal)
@@ -83,28 +130,43 @@ def animate_wave(wave_data, rfsignal, x_points, z_points, times, scatterer_pos, 
         """
         # Update the seismograph
         seismogram.set_data(
-            times[:frame], rfsignal[:frame])
+            times[:frame], rfsignal[:frame]
+        )
         ax_signal.set_xlim(0, times[frame])
         ax_signal.set_ylim(siz_min, siz_max)
 
         # Update the wave plot
         cax.set_array(wave_data[frame])
         ax_wave.set_title(
-            f'Time Step (nt) = {frame}')
+            f'Time Step (nt) = {frame}'
+        )
         ax_wave.set_xlabel('x-dimension (m)')
-        ax_wave.set_ylabel('z-dimension (depth in m)')
+        ax_wave.set_ylabel(
+            'z-dimension (depth in m)'
+        )
 
         # Update the progress bar
         progress_bar.update(1)
         return cax, seismogram
 
     # Create the animation object
-    ani = FuncAnimation(fig, update, frames=len(
-        times), interval=interval, repeat=False)
+    ani = FuncAnimation(
+        fig,
+        update,
+        frames=len(times),
+        interval=interval,
+        repeat=False,
+    )
 
     # Save the animation to a video file
-    writer = FFMpegWriter(fps=30, metadata=dict(artist='Me'), bitrate=1800)
-    ani.save(f"animations/{file}.mp4", writer=writer)
+    writer = FFMpegWriter(
+        fps=30,
+        metadata=dict(artist='Me'),
+        bitrate=1800,
+    )
+    ani.save(
+        f"animations/{file}.mp4", writer=writer
+    )
 
     # Close the progress bar
     progress_bar.close()
