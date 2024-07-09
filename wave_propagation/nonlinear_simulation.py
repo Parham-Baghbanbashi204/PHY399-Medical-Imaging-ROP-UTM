@@ -105,7 +105,7 @@ def simulate_using_steps_optimized(wave, medium, x_start, x_stop, x_steps, z_sta
         p[n + 1, 1:-1, 1:-1] = right_side * dt**2 + \
             2 * p[n, 1:-1, 1:-1] - p[n - 1, 1:-1, 1:-1]
 
-    return p
+    return p, x_points, z_points, times
 
 
 @run_on_gpu  # RUN THE SIM USING THE GPU
@@ -492,8 +492,7 @@ def simulate_using_steps_optimized_with_pulse_source(wave, medium, x_start, x_st
     p[0] = amplitude * sine_wave * gaussian_envelope  # without sin wave
     p[1] = p[0]
     # Creating the Gaussian pulse source term
-    src = amplitude * \
-        np.exp(-((np.arange(nt) - nt // 2)**2) / (2 * width**2))
+    src = amplitude * np.exp(-((times - nt // 2)**2) / (2 * width**2))
     sine_wave = np.sin(2 * np.pi * frequency * times)
     pulse = src
 

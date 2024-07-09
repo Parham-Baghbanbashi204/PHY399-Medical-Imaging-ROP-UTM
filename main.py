@@ -22,8 +22,8 @@ def main():
         - best resolution seeems to be 0.5 for the x and z steps, having an index every 0.5m
     """
     t_start = 0
-    # controls total simulation time - ie are we simulating 3 sec or whatnot
-    t_stop = 5  # in sec - the longer the time the better the resolution
+    # controls total simulation time - ie are we simulating 3 sec or whatnot must be an integer
+    t_stop = 4  # in sec - the longer the time the better the resolution
     # temporal resolution (dt = 0.005) - smaller this number better the aproximation - can never model real time due to calculs constraint(were using descrete math)
     t_steps = 2*t_stop*100  # Best temporal resolution with computing constraints also allows for constant temporal resolution with changes in time interval
     x_start = 0
@@ -42,7 +42,7 @@ def main():
     initial_amplitude = 7e-6  # Adjust this value to change wave strength
     frequency = 5e5  # 5 MHz
     # Define medium properties - note that souond speed will be wave speed in this instance
-    # TODO move this to the wave class insted
+    # TODO move the speed to the wave class insted
     medium = Medium(density=1.081e-3, sound_speed=1530)
 
     # Build the wave
@@ -50,7 +50,7 @@ def main():
         frequency=frequency, amplitude=initial_amplitude, speed=medium.sound_speed, nonlinearity=0.01)
 
     # SIMULATE
-    wavefield = simulate_using_steps_optimized(
+    wavefield, x_points, z_points, times = simulate_using_steps_optimized(
         wave, medium, x_start, x_stop, x_steps, z_start, z_stop, z_steps, t_start, t_stop, t_steps, scatterer_pos)
 
     # SIMULATION RESULTS
@@ -58,15 +58,6 @@ def main():
     print("Min value:", np.min(wavefield))
     print("Max value:", np.max(wavefield))
     print("Mean value:", np.mean(wavefield))
-
-    # Create the grid and timespacing for the animate function:
-    # TODO find out why i cant output the preasurewave and all the xpoints zpoints and times
-    x_points, dx = np.linspace(
-        x_start, x_stop, x_steps, retstep=True, endpoint=True)
-    z_points, dz = np.linspace(
-        z_start, z_stop, z_steps, retstep=True, endpoint=True)
-    times, dt = np.linspace(t_start, t_stop, t_steps,
-                            retstep=True, endpoint=True)
 
     # Create the sizemogram from the reciver
     rf_signal, times = simulate_reciver(
