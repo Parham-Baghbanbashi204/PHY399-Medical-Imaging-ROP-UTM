@@ -1,12 +1,29 @@
-Transducers
-===========
+transducers package
+===================
 
-.. automodule:: transducers
+Submodules
+----------
+
+transducers.linear\_array module
+--------------------------------
+
+.. automodule:: transducers.linear_array
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: transducers.linear_array
+transducers.phased\_array module
+--------------------------------
+
+.. automodule:: transducers.phased_array
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: transducers
    :members:
    :undoc-members:
    :show-inheritance:

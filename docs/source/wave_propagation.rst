@@ -1,25 +1,45 @@
-Wave Propagation
-================
-Wave propagation package, base classes and simulations for various wave types
+Wave Propgation Package
+=========================
 
-.. Keep init.py blank and use these files to add package discriptors otherwise the documentation becoms wacky
-.. automodule:: wave_propagation
+Submodules
+----------
+
+wave\_propagation.nonlinear\_simulation module
+----------------------------------------------
+
+.. automodule:: wave_propagation.nonlinear_simulation
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: wave_propagation.propagation
-   :members:
-   :undoc-members:
-   :show-inheritance:
+wave\_propagation.nonlinear\_wave module
+----------------------------------------
 
 .. automodule:: wave_propagation.nonlinear_wave
    :members:
    :undoc-members:
    :show-inheritance:
 
+wave\_propagation.propagation module
+------------------------------------
 
-.. automodule:: wave_propagation.nonlinear_simulation
+.. automodule:: wave_propagation.propagation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+wave\_propagation.scipy\_prototype module
+-----------------------------------------
+
+.. automodule:: wave_propagation.scipy_prototype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: wave_propagation
    :members:
    :undoc-members:
    :show-inheritance:

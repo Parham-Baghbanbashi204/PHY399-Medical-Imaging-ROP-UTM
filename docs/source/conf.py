@@ -17,19 +17,30 @@ release = '1.0'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 sys.path.insert(0, os.path.abspath('../../'))
 
-
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
-    'sphinx_autodoc_typehints'
+    'sphinx.ext.viewcode',
+    'sphinx.ext.todo',
 ]
 
 autodoc_default_options = {
     'members': True,
     'undoc-members': True,
     'private-members': True,
+    'special-members': '__init__',
+    'inherited-members': True,
     'show-inheritance': True,
 }
+
+
+def skip_member(app, what, name, obj, skip, options):
+    return skip
+
+
+def setup(app):
+    app.connect('autodoc-skip-member', skip_member)
+
 
 # Add LaTeX options
 latex_elements = {

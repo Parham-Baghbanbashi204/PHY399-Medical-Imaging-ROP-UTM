@@ -1,12 +1,29 @@
-Imaging
-=======
+imaging package
+===============
 
-.. automodule:: imaging
+Submodules
+----------
+
+imaging.image\_formation module
+-------------------------------
+
+.. automodule:: imaging.image_formation
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: imaging.image_formation
+imaging.image\_processing module
+--------------------------------
+
+.. automodule:: imaging.image_processing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: imaging
    :members:
    :undoc-members:
    :show-inheritance:
