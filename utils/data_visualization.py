@@ -12,8 +12,8 @@ import numpy as np
 from tqdm import tqdm
 
 
-@run_on_gpu
-def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_pos, interval=20, title='Wave Animation'):
+@run_on_gpu  # runs calculations on the gpu
+def animate_wave(wave_data, rfsignal, x_points, z_points, times, scatterer_pos, receiver_pos, interval=20, title='Wave Animation', file="wave_animation"):
     """
     Animates the wave data over time, representing the amplitude as a colorbar.
 
@@ -32,6 +32,7 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     :param interval: Time between frames in milliseconds.
     :type interval: int
     :param title: Title of the animation.
+    :param file: File Name without extension
     :type title: str
     """
     # Create the figure and axis objects
@@ -71,27 +72,27 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
     progress_bar = tqdm(total=len(times), desc="Rendering Animation")
 
     # set sizmogram max and min
-    siz_max = np.max(wave_data[:, receiver_pos[0], receiver_pos[1]])
-    siz_min = np.min(wave_data[:, receiver_pos[0], receiver_pos[1]])
+    siz_max = np.max(rfsignal)
+    siz_min = np.min(rfsignal)
 
     def update(frame):
         """
         Update function for each frame of the animation.
-
         :param frame: Current frame number.
         :type frame: int
         """
-        # Update the data for the current frame
-        cax.set_array(wave_data[frame])
-        ax_wave.set_title(f'Time Step (nt) = {frame}')
-        ax_wave.set_xlabel('x-dimension (mm)')
-        ax_wave.set_ylabel('z-dimension (depth in mm)')
-
-        # Update the seismogram
+        # Update the seismograph
         seismogram.set_data(
-            times[:frame], wave_data[:frame, receiver_pos[0], receiver_pos[1]])
+            times[:frame], rfsignal[:frame])
         ax_signal.set_xlim(0, times[frame])
         ax_signal.set_ylim(siz_min, siz_max)
+
+        # Update the wave plot
+        cax.set_array(wave_data[frame])
+        ax_wave.set_title(
+            f'Time Step (nt) = {frame}')
+        ax_wave.set_xlabel('x-dimension (m)')
+        ax_wave.set_ylabel('z-dimension (depth in m)')
 
         # Update the progress bar
         progress_bar.update(1)
@@ -103,7 +104,7 @@ def animate_wave(wave_data, x_points, z_points, times, scatterer_pos, receiver_p
 
     # Save the animation to a video file
     writer = FFMpegWriter(fps=30, metadata=dict(artist='Me'), bitrate=1800)
-    ani.save("animations/wave_animation.mp4", writer=writer)
+    ani.save(f"animations/{file}.mp4", writer=writer)
 
     # Close the progress bar
     progress_bar.close()

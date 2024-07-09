@@ -38,6 +38,7 @@ class NonlinearUltrasoundWave(UltrasoundWave):
         # Initialize the nonlinearity parameter
         self.nonlinearity = nonlinearity
 
+    # TODO REMOVE or have this work with density
     def propagate(self, distance, time):
         """
         Simulate the propagation of the nonlinear wave.
