@@ -3,19 +3,8 @@ Nonlinear Simulation Module
 ============================
 This module defines functions for simulating nonlinear wave propagation.
 """
-from matplotlib.animation import FuncAnimation, FFMpegWriter
-import matplotlib.colors as mcolors
-from matplotlib.animation import FuncAnimation
-import matplotlib.pyplot as plt
 import numpy as np
-from wave_propagation.nonlinear_wave import NonlinearUltrasoundWave
-from wave_propagation.propagation import Medium
-import scipy as sp
-from scipy.integrate import odeint
-from scipy.integrate import solve_ivp
-import pandas as pd
 from tqdm import tqdm
-import math
 from utils.run_on_gpu import run_on_gpu
 
 

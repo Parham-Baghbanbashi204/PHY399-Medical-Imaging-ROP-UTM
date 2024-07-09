@@ -19,10 +19,10 @@ def main():
 
     # Define simulation parameters
     t_start = 0
-    t_stop = 5  # in sec - the longer the time the better the resolution
+    t_stop = 3  # in sec - the longer the time the better the resolution
     # Controls simulation time, basicly how many timesteps we want to see bigger this is the better the simulation(better aproximation)
-    # temporal resolution (dt = 0.005) - larger this number better the aproximation
-    t_steps = 1000
+    # temporal resolution (dt = 0.005) - smaller this number better the aproximation - can never model real time due to calculs constraint(were using descrete math)
+    t_steps = 2*t_stop*100  # Best temporal resolution with computing constraints also allows for constant temporal resolution with changes in time interval
     x_start = 0
     """ 
     The resolution of the grid will be stop/steps in metres ie, x_stop = 1000 x_step = 100 => 10m resolution
