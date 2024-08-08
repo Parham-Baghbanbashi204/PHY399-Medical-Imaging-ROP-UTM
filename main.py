@@ -21,6 +21,8 @@ def main():
     """
     Main function to run the ultrasound simulation and visualization.
     """
+    # TODO talk about stability requirements- tie it into step size and CFL - throw down some math look at 1D wave eqn
+    # TODO more freq's and more wavelets
 
     # Define simulation parameters
     # The resolution of the grid will be stop/steps in metres ie,
@@ -71,7 +73,7 @@ def main():
         nonlinearity=0.01,
     )
 
-    # SIMULATE
+    # SIMULATE-Serialize during time steps
     wavefield, x_points, z_points, times = (
         simulate_using_steps_optimized(
             wave,

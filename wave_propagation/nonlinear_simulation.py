@@ -127,7 +127,7 @@ def simulate_using_steps_optimized(
     c = v / (dx / dt)
 
     # Ensure CFL conditions met
-    cfl_number = c * dt / min(dx, dz)
+    cfl_number = c * dt / min(dx, dz) # explore how this is degenrative in the final paper
 
     if cfl_number > 1:
         print("CFL Number", cfl_number)
