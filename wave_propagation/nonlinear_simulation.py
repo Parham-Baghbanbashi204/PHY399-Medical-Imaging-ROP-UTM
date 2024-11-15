@@ -123,11 +123,12 @@ def simulate_using_steps_optimized(
         medium.density * wave.speed
     )  # acoustic impidance in kg/m^3
 
-    # Set wave speed constant c = v/(dx/dt) - Ajusts v for spatial and time step
+    # Set wave speed constant c = v/(dx/dt) - Ajusts v for spatial and time step acording to x
     c = v / (dx / dt)
 
     # Ensure CFL conditions met
-    cfl_number = c * dt / min(dx, dz) # explore how this is degenrative in the final paper
+    # explore how this is degenrative in the final paper
+    cfl_number = c * dt / min(dx, dz)
 
     if cfl_number > 1:
         print("CFL Number", cfl_number)
@@ -144,7 +145,7 @@ def simulate_using_steps_optimized(
     X, Z = np.meshgrid(
         x_points, z_points, indexing='ij'
     )
-    sine_wave = np.cos(2 * np.pi * frequency * 0)
+    sine_wave = np.cos(2 * np.pi * frequency)
     gaussian_envelope = np.exp(
         -(
             (X - center_x) ** 2

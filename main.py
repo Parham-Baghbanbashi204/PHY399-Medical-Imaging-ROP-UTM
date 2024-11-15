@@ -116,7 +116,7 @@ def main():
         times,
         scatterer_pos,
         receiver_pos,
-        file="using_steps_no_source",
+        file="using_steps_no_source_freq_added",
     )
 
 
